@@ -1,0 +1,203 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+import { siteConfig } from '../../config';
+import indexCSS from '../../styles/index.css?raw';
+import '../../styles/index.css';
+import '../../styles/global.css';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('posts');
+  
+  // 获取所有标签
+  const tags = new Set(
+    posts.flatMap(post => post.data.tags || [])
+  );
+  
+  return Array.from(tags).map(tag => ({
+    params: { tag },
+    props: { tag, posts: posts.filter(post => post.data.tags && post.data.tags.includes(tag)) }
+  }));
+}
+
+export const prerender = true;
+
+const { tag, posts } = Astro.props;
+
+// 格式化日期
+const formatDate = (date: Date) => {
+  return new Intl.DateTimeFormat('zh-CN', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  }).format(date);
+};
+---
+
+<Layout title={`标签 - ${tag}`} description={`标签为"${tag}"的所有文章`}>
+  <!-- 主要内容区域 -->
+  <section class="content-section">
+    <div class="container">
+      <div class="main-column">
+        <!-- 标签信息卡片 -->
+        <div class="tag-card fade-in">
+          <div class="tag-header">
+            <h1 class="tag-title">#{tag}</h1>
+            <p class="tag-description">共 {posts?.length || 0} 篇文章</p>
+          </div>
+        </div>
+
+        <!-- 文章列表 -->
+        <div class="posts-card base-card fade-in">
+          <h2 class="section-title">标签文章</h2>
+          {posts && posts.length > 0 ? (
+            <div class="posts-list">
+              {posts.map(post => (
+                <article class="post-item">
+                  <div class="post-meta">
+                    <time datetime={(post.data.pubDate || post.data.date).toISOString()}>{formatDate(post.data.pubDate || post.data.date)}</time>
+                    {post.data.author && (
+                      <span class="post-author">{post.data.author}</span>
+                    )}
+                    {post.data.categories && Array.isArray(post.data.categories) && post.data.categories.length > 0 && (
+                      <div class="post-categories">
+                        {post.data.categories.map(category => (
+                          <a href={`/categories/${category}`} class="post-category">{category}</a>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <h3 class="post-title">
+                    <a href={`/posts/${post.slug}`}>{post.data.title}</a>
+                  </h3>
+                  {post.data.description && (
+                    <p class="post-description">{post.data.description}</p>
+                  )}
+                  {post.data.tags && Array.isArray(post.data.tags) && post.data.tags.length > 0 && (
+                    <div class="tags">
+                      {post.data.tags.map(t => (
+                        <a href={`/tags/${t}`} class={`tag ${t === tag ? 'active' : ''}`}>#{t}</a>
+                      ))}
+                    </div>
+                  )}
+                </article>
+              ))}
+            </div>
+          ) : (
+            <p class="empty-message">暂无相关文章，敬请期待！</p>
+          )}
+        </div>
+
+        <!-- 导航 -->
+        <div class="navigation-card base-card fade-in">
+          <div class="tag-navigation">
+            <a href="/tags" class="nav-link">← 返回标签首页</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <style is:global>{indexCSS}</style>
+  
+  <!-- 标签页面特定样式 -->
+  <style>
+    .tag-card {
+      max-width: 800px;
+      margin: 0 auto;
+      margin-top: -2rem;
+      padding: 2rem;
+      text-align: center;
+    }
+    
+    .tag-title {
+      font-size: 2.5rem;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+      color: var(--primary-color);
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    }
+    
+    .tag-description {
+      font-size: 1.2rem;
+      color: var(--text-color);
+      opacity: 0.8;
+    }
+    
+    .navigation-card {
+      max-width: 800px;
+      margin: 0 auto;
+      margin-top: 2rem;
+      padding: 1.5rem;
+    }
+    
+    .tag-navigation {
+      text-align: center;
+    }
+    
+    .nav-link {
+      display: inline-block;
+      color: var(--text-color);
+      text-decoration: none;
+      font-weight: 500;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      transition: all 0.3s ease;
+    }
+    
+    .nav-link:hover {
+      background-color: var(--primary-color);
+      color: white;
+      transform: translateY(-2px);
+    }
+    
+    .tag.active {
+      background: var(--primary-color);
+      color: white;
+    }
+    
+    /* 移动端适配 */
+    @media (max-width: 768px) {
+      .tag-card {
+        padding: 1.5rem;
+        margin-top: -1.5rem;
+      }
+      
+      .tag-title {
+        font-size: 2rem;
+      }
+      
+      .tag-description {
+        font-size: 1rem;
+      }
+      
+      .navigation-card {
+        padding: 1rem;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .tag-card {
+        padding: 1rem;
+        margin-top: -1rem;
+      }
+      
+      .tag-title {
+        font-size: 1.8rem;
+      }
+      
+      .tag-description {
+        font-size: 0.95rem;
+      }
+      
+      .navigation-card {
+        padding: 0.8rem;
+      }
+      
+      .nav-link {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</Layout>

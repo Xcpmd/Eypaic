@@ -1,0 +1,367 @@
+.not-found-main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 60px);
+  padding: 2rem 0;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.not-found-content {
+  text-align: center;
+  padding: 4rem 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.error-code {
+  font-size: 8rem;
+  font-weight: bold;
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+  opacity: 0.8;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.error-title {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  color: var(--text-color);
+}
+
+.error-description {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+  color: var(--text-color);
+  opacity: 0.8;
+}
+
+.error-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 3rem;
+}
+
+.btn {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+:root {
+  --btn-primary-bg: var(--primary-color);
+  --btn-primary-text: white;
+  --btn-primary-hover-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  --btn-secondary-bg: transparent;
+  --btn-secondary-text: var(--text-color);
+  --btn-secondary-border: var(--border-color);
+  --btn-secondary-hover-bg: var(--card-bg);
+  --btn-secondary-hover-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  --btn-hover-transform: translateY(-3px);
+}
+
+.btn-primary {
+  background-color: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
+}
+
+.btn-primary:hover {
+  transform: var(--btn-hover-transform);
+  box-shadow: var(--btn-primary-hover-shadow);
+}
+
+.btn-secondary {
+  background-color: var(--btn-secondary-bg);
+  color: var(--btn-secondary-text);
+  border: 2px solid var(--btn-secondary-border);
+}
+
+.btn-secondary:hover {
+  background-color: var(--btn-secondary-hover-bg);
+  transform: var(--btn-hover-transform);
+  box-shadow: var(--btn-secondary-hover-shadow);
+}
+
+/* 幽灵动画 */
+.error-illustration {
+  position: relative;
+  height: 200px;
+  margin-top: 2rem;
+}
+
+.ghost {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  animation: float 3s ease-in-out infinite;
+}
+
+.ghost-body {
+  width: 120px;
+  height: 150px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 60px 60px 0 0;
+  position: relative;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.ghost-eyes {
+  position: absolute;
+  top: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 20px;
+}
+
+.eye {
+  width: 20px;
+  height: 20px;
+  background-color: #333;
+  border-radius: 50%;
+  position: relative;
+}
+
+.eye::before {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background-color: white;
+  border-radius: 50%;
+  top: 3px;
+  right: 3px;
+}
+
+.ghost-mouth {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 20px;
+  border-bottom-left-radius: 40px;
+  border-bottom-right-radius: 40px;
+  background-color: #333;
+}
+
+.ghost-tail {
+  position: absolute;
+  bottom: -30px;
+  left: 0;
+  width: 120px;
+  height: 40px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.ghost-tail::before,
+.ghost-tail::after {
+  content: '';
+  width: 30px;
+  height: 40px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-bottom-left-radius: 30px;
+  border-bottom-right-radius: 30px;
+}
+
+.ghost-tail::before {
+  animation: wave 1.5s ease-in-out infinite;
+}
+
+.ghost-tail::after {
+  animation: wave 1.5s ease-in-out 0.5s infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translate(-50%, -50%);
+  }
+  50% {
+    transform: translate(-50%, -60%);
+  }
+}
+
+@keyframes wave {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .not-found-main {
+    padding: 1.5rem 0;
+  }
+  
+  .not-found-content {
+    padding: 3rem 1.5rem;
+  }
+  
+  .error-code {
+    font-size: 6rem;
+    margin-bottom: 0.8rem;
+  }
+  
+  .error-title {
+    font-size: 2rem;
+    margin-bottom: 0.8rem;
+  }
+  
+  .error-description {
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .error-actions {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 2rem;
+  }
+  
+  .btn {
+    width: 200px;
+    padding: 0.6rem 1.2rem;
+  }
+  
+  .error-illustration {
+    height: 150px;
+    margin-top: 1.5rem;
+  }
+  
+  .ghost-body {
+    width: 100px;
+    height: 125px;
+  }
+  
+  .ghost-eyes {
+    top: 35px;
+    gap: 15px;
+  }
+  
+  .eye {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .eye::before {
+    width: 6px;
+    height: 6px;
+  }
+  
+  .ghost-mouth {
+    bottom: 35px;
+    width: 35px;
+    height: 18px;
+  }
+  
+  .ghost-tail {
+    bottom: -25px;
+    width: 100px;
+    height: 35px;
+  }
+  
+  .ghost-tail::before,
+  .ghost-tail::after {
+    width: 25px;
+    height: 35px;
+    border-bottom-left-radius: 25px;
+    border-bottom-right-radius: 25px;
+  }
+}
+
+@media (max-width: 480px) {
+  .not-found-main {
+    padding: 1rem 0;
+  }
+  
+  .not-found-content {
+    padding: 2rem 1rem;
+  }
+  
+  .error-code {
+    font-size: 5rem;
+    margin-bottom: 0.6rem;
+  }
+  
+  .error-title {
+    font-size: 1.8rem;
+    margin-bottom: 0.6rem;
+  }
+  
+  .error-description {
+    font-size: 0.9rem;
+    margin-bottom: 1.2rem;
+  }
+  
+  .error-actions {
+    gap: 0.6rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .btn {
+    width: 180px;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+  
+  .error-illustration {
+    height: 120px;
+    margin-top: 1rem;
+  }
+  
+  .ghost-body {
+    width: 80px;
+    height: 100px;
+  }
+  
+  .ghost-eyes {
+    top: 30px;
+    gap: 12px;
+  }
+  
+  .eye {
+    width: 15px;
+    height: 15px;
+  }
+  
+  .eye::before {
+    width: 5px;
+    height: 5px;
+  }
+  
+  .ghost-mouth {
+    bottom: 30px;
+    width: 30px;
+    height: 15px;
+  }
+  
+  .ghost-tail {
+    bottom: -20px;
+    width: 80px;
+    height: 30px;
+  }
+  
+  .ghost-tail::before,
+  .ghost-tail::after {
+    width: 20px;
+    height: 30px;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+  }
+}

@@ -1,0 +1,145 @@
+---
+export interface Props {
+    text: string | string[];
+    speed?: number;
+    deleteSpeed?: number;
+    pauseTime?: number;
+    class?: string;
+}
+
+const { text, speed = 100, deleteSpeed = 50, pauseTime = 2000, class: className = "" } = Astro.props;
+
+// 导入组件样式
+import typewriterTextCSS from '../styles/typewriter-text.css?raw';
+
+// 确保text是数组
+let texts = Array.isArray(text) ? text : [text];
+const textData = JSON.stringify(texts);
+
+// 添加调试日志
+// console.log('TypewriterText props:', { text, speed, deleteSpeed, pauseTime, className });
+// console.log('TypewriterText texts:', texts);
+// console.log('TypewriterText textData:', textData);
+---
+
+<div class={`typewriter-wrapper ${className}`}>
+    <span class="typewriter-text" data-text={textData} data-speed={speed} data-delete-speed={deleteSpeed} data-pause-time={pauseTime}></span>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('Typewriter script loaded');
+    
+    const typewriterElements = document.querySelectorAll('.typewriter-text');
+    console.log('Found typewriter elements:', typewriterElements.length);
+    
+    if (typewriterElements.length === 0) {
+        console.log('No typewriter elements found');
+        return;
+    }
+    
+    typewriterElements.forEach((element, index) => {
+        console.log(`Processing element ${index}:`, element);
+        
+        const textData = element.dataset.text || '';
+        console.log('Text data:', textData);
+        
+        const speed = parseInt(element.dataset.speed || '100');
+        const deleteSpeed = parseInt(element.dataset.deleteSpeed || '50');
+        const pauseTime = parseInt(element.dataset.pauseTime || '2000');
+        
+        let texts;
+        try {
+            texts = JSON.parse(textData);
+            if (!Array.isArray(texts)) {
+                texts = [textData];
+            }
+        } catch (e) {
+            console.error('Error parsing text data:', e);
+            texts = [textData];
+        }
+        
+        console.log('Parsed texts:', texts);
+        
+        if (texts.length === 0) {
+            console.log('No texts to display');
+            return;
+        }
+        
+        let textIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+        let timeout;
+        
+        function type() {
+            const currentText = texts[textIndex];
+            const wrapper = element.parentElement;
+            
+            // 添加打字动画类
+            wrapper.classList.add('typing');
+            
+            if (isDeleting) {
+                element.textContent = currentText.substring(0, charIndex - 1);
+                charIndex--;
+                
+                if (charIndex === 0) {
+                    isDeleting = false;
+                    textIndex = (textIndex + 1) % texts.length;
+                    timeout = setTimeout(type, 500);
+                } else {
+                    timeout = setTimeout(type, deleteSpeed);
+                }
+            } else {
+                element.textContent = currentText.substring(0, charIndex + 1);
+                charIndex++;
+                
+                if (charIndex === currentText.length) {
+                    // 完成打字，移除动画类
+                    setTimeout(() => {
+                        wrapper.classList.remove('typing');
+                    }, 500);
+                    
+                    if (texts.length > 1) {
+                        isDeleting = true;
+                        timeout = setTimeout(type, pauseTime);
+                    }
+                } else {
+                    timeout = setTimeout(type, speed);
+                }
+            }
+        }
+        
+        // 添加闪烁的光标
+        const wrapper = element.parentElement;
+        wrapper.style.position = 'relative';
+        
+        // 创建光标元素
+        const cursor = document.createElement('span');
+        cursor.textContent = '|';
+        cursor.style.animation = 'blink 1s infinite';
+        cursor.style.marginLeft = '2px';
+        cursor.className = 'typewriter-cursor';
+        
+        // 添加CSS动画
+        if (!document.querySelector('#typewriter-cursor-style')) {
+            const style = document.createElement('style');
+            style.id = 'typewriter-cursor-style';
+            style.textContent = `
+                @keyframes blink {
+                    0%, 50% { opacity: 1; }
+                    51%, 100% { opacity: 0; }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+        
+        // 将光标添加到元素后面
+        wrapper.appendChild(cursor);
+        
+        // 开始打字效果
+        type();
+    });
+});
+</script>
+
+<style is:global>{typewriterTextCSS}</style>

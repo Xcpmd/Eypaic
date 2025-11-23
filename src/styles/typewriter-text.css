@@ -1,0 +1,19 @@
+/* TypewriterText 组件样式 */
+.typewriter-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.typewriter-text {
+    color: white;
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    display: inline-block;
+}
+
+.typewriter-cursor {
+    color: white;
+    font-weight: bold;
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}

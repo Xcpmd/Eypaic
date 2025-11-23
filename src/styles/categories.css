@@ -1,0 +1,263 @@
+/* 分类页面样式 */
+
+.categories-main {
+  padding: 2rem 0;
+  min-height: calc(100vh - 60px);
+}
+
+.container {
+  max-width: var(--content-width);
+  margin: 0 auto;
+  padding: 0 1rem
+}
+
+.categories-header {
+  margin-bottom: 3rem;
+  text-align: center;
+}
+
+.categories-title {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.categories-description {
+  font-size: 1.1rem;
+  color: var(--text-color);
+  opacity: 0.8;
+}
+
+.categories-content {
+  margin-bottom: 3rem;
+}
+
+.categories-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.category-card {
+  display: flex;
+  flex-direction: column;
+  padding: 2rem;
+  text-decoration: none;
+  color: var(--text-color);
+  transition: all 0.3s ease;
+}
+
+.category-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  background-color: rgba(var(--primary-color-rgb), 0.05);
+}
+
+.category-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(var(--primary-color-rgb), 0.1);
+  color: var(--primary-color);
+  border-radius: 50%;
+  margin-bottom: 1.5rem;
+}
+
+.category-name {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.category-count {
+  font-size: 1rem;
+  color: var(--text-color);
+  opacity: 0.7;
+  margin-bottom: 1rem;
+}
+
+.category-latest {
+  margin-top: auto;
+  font-size: 0.9rem;
+  color: var(--text-color);
+  opacity: 0.8;
+}
+
+.latest-label {
+  display: block;
+  margin-bottom: 0.3rem;
+}
+
+.latest-post {
+  color: var(--primary-color);
+  text-decoration: none;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+}
+
+.latest-post:hover {
+  text-decoration: underline;
+}
+
+.empty-categories {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  background-color: var(--card-bg);
+  border-radius: 8px;
+  text-align: center;
+}
+
+.empty-icon {
+  color: var(--text-color);
+  opacity: 0.3;
+  margin-bottom: 1.5rem;
+}
+
+.empty-title {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-color);
+}
+
+.empty-description {
+  font-size: 1rem;
+  color: var(--text-color);
+  opacity: 0.7;
+  max-width: 500px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .categories-main {
+    padding: 1.5rem 0;
+  }
+  
+  .container {
+    padding: 0 0.75rem;
+  }
+  
+  .categories-header {
+    margin-bottom: 2rem;
+  }
+  
+  .categories-title {
+    font-size: 2rem;
+  }
+  
+  .categories-description {
+    font-size: 1rem;
+  }
+  
+  .categories-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .category-card {
+    padding: 1.5rem;
+  }
+  
+  .category-icon {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .category-name {
+    font-size: 1.3rem;
+  }
+  
+  .category-count {
+    font-size: 0.9rem;
+  }
+  
+  .category-latest {
+    font-size: 0.8rem;
+  }
+  
+  .empty-categories {
+    padding: 3rem 1.5rem;
+  }
+  
+  .empty-title {
+    font-size: 1.3rem;
+  }
+  
+  .empty-description {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .categories-main {
+    padding: 1rem 0;
+  }
+  
+  .container {
+    padding: 0 0.5rem;
+  }
+  
+  .categories-header {
+    margin-bottom: 2rem;
+  }
+  
+  .categories-title {
+    font-size: 1.8rem;
+  }
+  
+  .categories-description {
+    font-size: 0.9rem;
+  }
+  
+  .categories-content {
+    margin-bottom: 2rem;
+  }
+  
+  .categories-grid {
+    gap: 1rem;
+  }
+  
+  .category-card {
+    padding: 1rem;
+  }
+  
+  .category-icon {
+    width: 36px;
+    height: 36px;
+    margin-bottom: 1rem;
+  }
+  
+  .category-name {
+    font-size: 1.2rem;
+  }
+  
+  .category-count {
+    font-size: 0.8rem;
+    margin-bottom: 0.8rem;
+  }
+  
+  .category-latest {
+    font-size: 0.75rem;
+  }
+  
+  .empty-categories {
+    padding: 2rem 1rem;
+  }
+  
+  .empty-icon {
+    margin-bottom: 1rem;
+  }
+  
+  .empty-title {
+    font-size: 1.2rem;
+  }
+  
+  .empty-description {
+    font-size: 0.8rem;
+  }
+}

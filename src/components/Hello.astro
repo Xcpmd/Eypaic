@@ -1,0 +1,45 @@
+---
+import { siteConfig, profileConfig } from '../config';
+import helloCSS from '../styles/hello.css?raw';
+import avatarImage from '../assets/avatar.jpg';
+
+interface Props {
+  name?: string;
+  message?: string;
+}
+
+const { name = profileConfig.name, message = '欢迎来到我的博客' } = Astro.props;
+---
+
+<div class="hello-container">
+  <div class="hello-content">
+    <div class="hello-avatar">
+      {profileConfig.avatar ? (
+        <img 
+          src={avatarImage} 
+          alt={profileConfig.name}
+          class="avatar-image"
+        />
+      ) : (
+        <div class="avatar-placeholder">{profileConfig.name.charAt(0)}</div>
+      )}
+    </div>
+    
+    <div class="hello-text">
+      <h1 class="hello-title">你好，我是 <span class="highlight">{name}</span></h1>
+      <p class="hello-message">{message}</p>
+      <div class="hello-actions">
+        <a href="/about" class="hello-button primary">了解更多</a>
+        <a href="/archive" class="hello-button secondary">浏览文章</a>
+      </div>
+    </div>
+  </div>
+  
+  <div class="hello-decoration">
+    <div class="decoration-item item-1"></div>
+    <div class="decoration-item item-2"></div>
+    <div class="decoration-item item-3"></div>
+    <div class="decoration-item item-4"></div>
+  </div>
+</div>
+<style is:global>{helloCSS}</style>

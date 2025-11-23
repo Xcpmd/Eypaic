@@ -1,0 +1,39 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { siteConfig } from '../config';
+import notFoundCSS from '../styles/404.css?raw';
+import '../styles/404.css';
+import '../styles/global.css';
+---
+
+<Layout title="404 - 页面未找到" description="您访问的页面不存在">
+  <main class="not-found-main">
+    <div class="container">
+      <div class="not-found-content base-card">
+        <div class="error-code">404</div>
+        <h1 class="error-title">页面未找到</h1>
+        <p class="error-description">
+          抱歉，您访问的页面不存在或已被移动。
+        </p>
+        <div class="error-actions">
+          <a href="/" class="btn btn-primary">返回首页</a>
+          <a href="javascript:history.back()" class="btn btn-secondary">返回上页</a>
+        </div>
+        <div class="error-illustration">
+          <div class="ghost">
+            <div class="ghost-body">
+              <div class="ghost-eyes">
+                <div class="eye left"></div>
+                <div class="eye right"></div>
+              </div>
+              <div class="ghost-mouth"></div>
+            </div>
+            <div class="ghost-tail"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <!-- 404页面样式 -->
+  <style is:global>{notFoundCSS}</style>
+</Layout>

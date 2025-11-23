@@ -1,5 +1,36 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
+import swup from '@swup/astro';
 
 // https://astro.build/config
-export default defineConfig({});
+export default defineConfig({
+  output: 'server',
+  devToolbar: {
+    enabled: false,
+  },
+  integrations: [
+    swup({
+      theme: false,
+      animationClass: "transition-swup-", // 避免与Tailwind的transition类冲突
+      containers: ["main"],
+      smoothScrolling: true,
+      cache: true,
+      preload: false,
+      accessibility: true,
+      updateHead: true,
+      updateBodyClass: false,
+      globalInstance: true,
+      resolveUrl: (url) => url,
+      animateHistoryBrowsing: false,
+      skipPopStateHandling: (event) => {
+        // 跳过锚点链接的处理，让浏览器原生处理
+        return event.state && event.state.url && event.state.url.includes("#");
+      },
+    })
+  ],
+  vite: {
+    define: {
+      global: 'globalThis'
+    }
+  }
+});

@@ -1,0 +1,427 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { Image } from 'astro:assets';
+import { siteConfig, postConfig, profileConfig } from '../../config';
+import { getCollection } from 'astro:content';
+import '../../styles/post.css';
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+  const posts = await getCollection('posts');
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content, headings } = await post.render();
+
+// 计算文章字数和预计阅读时间
+const calculateReadingTime = (post: any) => {
+  // 获取文章内容
+  const content = post.body;
+  
+  // 计算中文字数（包括中文标点）
+  const chineseChars = (content.match(/[\u4e00-\u9fa5]/g) || []).length;
+  
+  // 计算英文单词数
+  const englishWords = (content.match(/[a-zA-Z]+/g) || []).length;
+  
+  // 总字数（中文字数 + 英文单词数）
+  const totalWords = chineseChars + englishWords;
+  
+  // 计算预计阅读时间（中文按300字/分钟，英文按200词/分钟）
+  const chineseTime = chineseChars / 300;
+  const englishTime = englishWords / 200;
+  const totalMinutes = Math.ceil(chineseTime + englishTime);
+  
+  return {
+    wordCount: totalWords,
+    readingTime: totalMinutes
+  };
+};
+
+// 计算文章字数和预计阅读时间
+const { wordCount, readingTime } = calculateReadingTime(post);
+
+// 格式化日期
+const formatDate = (date: Date) => {
+  return new Intl.DateTimeFormat('zh-CN', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  }).format(date);
+};
+
+// 获取所有文章数据，用于相关文章推荐
+const allPosts = await getCollection('posts');
+
+// 相关文章推荐算法
+const getRelatedPosts = (currentPost, allPosts, limit = 3) => {
+  // 获取当前文章的标签和分类
+  const currentTags = currentPost.data.tags || [];
+  const currentCategories = currentPost.data.categories || [];
+  
+  // 计算每篇文章与当前文章的相关性得分
+  const scoredPosts = allPosts
+    .filter(post => post.slug !== currentPost.slug) // 排除当前文章
+    .map(post => {
+      const postTags = post.data.tags || [];
+      const postCategories = post.data.categories || [];
+      
+      // 计算标签匹配度（每个匹配标签得2分）
+      const tagScore = currentTags.filter(tag => postTags.includes(tag)).length * 2;
+      
+      // 计算分类匹配度（每个匹配分类得3分）
+      const categoryScore = currentCategories.filter(category => postCategories.includes(category)).length * 3;
+      
+      // 如果有相同的分类，额外加分
+      const hasSameCategory = currentCategories.some(category => postCategories.includes(category));
+      const bonusScore = hasSameCategory ? 5 : 0;
+      
+      // 总分
+      const totalScore = tagScore + categoryScore + bonusScore;
+      
+      return {
+        post,
+        score: totalScore
+      };
+    })
+    .filter(item => item.score > 0) // 只保留有相关性的文章
+    .sort((a, b) => b.score - a.score) // 按得分降序排列
+    .slice(0, limit); // 取前N篇
+  
+  return scoredPosts.map(item => item.post);
+};
+
+// 生成目录
+const generateTOC = (headings: any[]) => {
+  return headings.filter(heading => heading.depth <= postConfig.toc.depth);
+};
+
+// 获取相关文章
+const relatedPosts = getRelatedPosts(post, allPosts, 3);
+---
+
+<Layout title={post.data.title} description={post.data.description}>
+  <style is:global>
+    {postCSS}
+  </style>
+  <main class="post-main">
+    <div class="container">
+      <div class="post-wrapper">
+        <!-- 文章内容 -->
+        <article class="post-article base-card">
+          <!-- 文章头部 -->
+          <header class="post-header">
+            <h1 class="post-title">{post.data.title}</h1>
+
+            <!-- 作者信息 -->
+            <div class="author-section">
+              <!-- <h3 class="section-title">关于作者</h3> -->
+              <div class="author-info">
+                <div class="author-avatar">
+                  {post.data.authorAvatar ? (
+                    <Image 
+                      src={post.data.authorAvatar} 
+                      alt={post.data.author || '作者'}
+                      width={80}
+                      height={80}
+                    />
+                  ) : (
+                    <div class="avatar-placeholder">{(post.data.author || '作者').charAt(0)}</div>
+                  )}
+                </div>
+                <div class="author-details">
+                  <h4 class="author-name">{post.data.author || '作者'}</h4>
+                  <p class="author-bio">{post.data.authorBio || '热爱技术，喜欢分享'}</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="post-meta">
+              <time datetime={(post.data.pubDate || post.data.date).toISOString()}>{formatDate(post.data.pubDate || post.data.date)}</time>
+              {post.data.categories && post.data.categories.length > 0 && (
+                <div class="post-categories">
+                  {post.data.categories.map((category) => (
+                    <a href={`/categories/${category}`} class="post-category">{category}</a>
+                  ))}
+                </div>
+              )}
+              <span class="post-word-count">字数: {wordCount}</span>
+              <span class="post-reading-time">预计阅读: {readingTime} 分钟</span>
+              {post.data.updatedDate && (
+                <span class="post-updated">更新于 {formatDate(post.data.updatedDate)}</span>
+              )}
+            </div>
+            {post.data.tags && post.data.tags.length > 0 && (
+              <div class="tags">
+                {post.data.tags.map((tag) => (
+                  <a href={`/tags/${tag}`} class="tag">#{tag}</a>
+                ))}
+              </div>
+            )}
+          </header>
+
+
+
+          <!-- 文章内容 -->
+          <div class="post-content">
+            <Content />
+          </div>
+
+          <!-- 文章底部 -->
+          <footer class="post-footer">
+            <div class="post-navigation">
+              {post.data.prevPost && (
+                <a href={`/posts/${post.data.prevPost}`} class="nav-link prev-link">
+                  <span class="nav-direction">← 上一篇</span>
+                  <span class="nav-title">{post.data.prevPostTitle}</span>
+                </a>
+              )}
+              {post.data.nextPost && (
+                <a href={`/posts/${post.data.nextPost}`} class="nav-link next-link">
+                  <span class="nav-direction">下一篇 →</span>
+                  <span class="nav-title">{post.data.nextPostTitle}</span>
+                </a>
+              )}
+            </div>
+
+            <!-- 版权声明 -->
+            {postConfig.copyright.enable && (
+              (() => {
+                // 检查是否有任何版权相关内容
+                const hasCustomLicense = !!post.data.customLicense;
+                const hasCustomCopyright = !!post.data.customCopyright;
+                const hasAuthorInfo = postConfig.copyright.authorInfo && (post.data.author || profileConfig.name);
+                const hasAdditionalInfo = !!postConfig.copyright.additionalInfo;
+                
+                // 如果没有任何内容，则不显示版权声明
+                if (!hasCustomLicense && !hasCustomCopyright && !hasAuthorInfo && !hasAdditionalInfo) {
+                  return null;
+                }
+                
+                return (
+                  <div class="post-copyright">
+                    <h3>版权声明</h3>
+                    {hasCustomLicense ? (
+                      <p set:html={`本文采用 <a href="${post.data.customLicenseUrl || postConfig.copyright.licenseUrl}" target="_blank" rel="noopener noreferrer">${post.data.customLicense}</a> 许可协议进行许可。转载请注明出处！`}></p>
+                    ) : (
+                      <p set:html={postConfig.copyright.statement.replace('{license}', `<a href="${postConfig.copyright.licenseUrl}" target="_blank" rel="noopener noreferrer">${postConfig.copyright.license}</a>`).replace('{author}', post.data.author || profileConfig.name)}></p>
+                    )}
+                    <p>本文链接：<a href={post.url}>{post.url}</a></p>
+                    {hasAuthorInfo && (
+                      <p>作者：{post.data.author || profileConfig.name}</p>
+                    )}
+                    {hasAdditionalInfo && (
+                      <p>{postConfig.copyright.additionalInfo}</p>
+                    )}
+                    {hasCustomCopyright && (
+                      <p>{post.data.customCopyright}</p>
+                    )}
+                  </div>
+                );
+              })()
+            )}
+
+            <!-- 相关文章 -->
+            {relatedPosts.length > 0 && (
+              <div class="related-posts-section card">
+                <h3 class="section-title">相关文章</h3>
+                <div class="related-posts">
+                  {relatedPosts.map((relatedPost) => (
+                    <a href={`/posts/${relatedPost.slug}`} class="related-post">
+                      <div class="related-post-title">{relatedPost.data.title}</div>
+                      <div class="related-post-date">{formatDate(relatedPost.data.pubDate || relatedPost.data.date)}</div>
+                      {relatedPost.data.tags && relatedPost.data.tags.length > 0 && (
+                        <div class="related-post-tags">
+                          {relatedPost.data.tags.slice(0, 3).map((tag) => (
+                            <span class="related-post-tag">#{tag}</span>
+                          ))}
+                        </div>
+                      )}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
+          </footer>
+        </article>
+
+        <!-- 侧边栏 -->
+        <aside class="post-sidebar">
+          <!-- 目录 -->
+          {postConfig.toc.enable && generateTOC(headings).length > 0 && (
+              <>
+                <h1 class="sidebar-title" id="toc-toggle">目录</h1>
+                <nav class="toc-nav">
+                  <ul>
+                    {generateTOC(headings).map((heading) => (
+                      <li class={`toc-item toc-level-${heading.depth}`}>
+                        <a href={`#${heading.slug}`} class="toc-link">{heading.text}</a>
+                      </li>
+                    ))}
+                  </ul>
+                </nav>
+              </>
+          )}
+        </aside>
+      </div>
+    </div>
+  </main>
+
+  <!-- 目录高亮脚本 -->
+  {postConfig.toc.enable && (
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const tocLinks = document.querySelectorAll('.toc-link');
+        const headings = Array.from(document.querySelectorAll('h1, h2, h3, h4, h5, h6'))
+          .filter(heading => heading.id);
+        
+        // 目录折叠功能（仅在窄窗口下启用）
+        const sidebarElement = document.querySelector('.post-sidebar');
+        const tocToggle = document.getElementById('toc-toggle');
+        
+        // 检查是否是窄窗口
+        function isNarrowWindow() {
+          return window.innerWidth <= 768;
+        }
+        
+        // 初始化目录折叠状态
+        function initTocToggle() {
+          if (sidebarElement && tocToggle) {
+            // 添加点击事件
+            tocToggle.addEventListener('click', () => {
+              sidebarElement.classList.toggle('expanded');
+            });
+            
+            // 在窄窗口下默认折叠目录
+            if (isNarrowWindow()) {
+              sidebarElement.classList.remove('expanded');
+            }
+          }
+        }
+        
+        // 窗口大小改变时重新初始化
+        window.addEventListener('resize', () => {
+          if (!isNarrowWindow() && sidebarElement) {
+            // 在宽窗口下移除折叠状态
+            sidebarElement.classList.remove('expanded');
+          }
+        });
+        
+        // 初始化
+        initTocToggle();
+
+        // 高亮当前可见的标题对应的目录项
+        function highlightTocItem() {
+          let current = '';
+          
+          headings.forEach(heading => {
+            const rect = heading.getBoundingClientRect();
+            if (rect.top <= 100) {
+              current = heading.id;
+            }
+          });
+
+          tocLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === `#${current}`) {
+              link.classList.add('active');
+            }
+          });
+        }
+
+        // 平滑滚动到目标标题，添加过渡动画
+        tocLinks.forEach(link => {
+          link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetId = link.getAttribute('href').substring(1);
+            const targetElement = document.getElementById(targetId);
+            
+            if (targetElement) {
+              // 在窄窗口下点击目录项后自动折叠目录
+              if (isNarrowWindow() && sidebarElement) {
+                sidebarElement.classList.remove('expanded');
+              }
+              
+              // 添加点击效果
+              link.style.transform = 'scale(0.95)';
+              link.style.transition = 'transform 0.2s ease';
+              setTimeout(() => {
+                link.style.transform = '';
+              }, 200);
+  
+              // 直接滚动到目标位置，不需要延迟
+              const elementRect = targetElement.getBoundingClientRect();
+              const targetScrollTop = elementRect.top;
+              
+              window.scrollTo({
+                top: (targetScrollTop - 200),
+                behavior: 'smooth'
+              });
+              
+              // 高亮目标元素
+              highlightTargetElement();
+              
+              function highlightTargetElement() {
+                // 为目标标题添加高亮效果
+                targetElement.style.transition = 'all 0.5s ease';
+                targetElement.style.backgroundColor = 'rgba(var(--primary-color-rgb), 0.1)';
+                targetElement.style.paddingLeft = '10px';
+                targetElement.style.borderLeft = '4px solid var(--primary-color)';
+                targetElement.style.boxShadow = '0 0 15px rgba(var(--primary-color-rgb), 0.2)';
+                targetElement.style.borderRadius = '4px';
+                
+                // 创建并添加动画指示器
+                const indicator = document.createElement('div');
+                indicator.style.position = 'absolute';
+                indicator.style.left = '-20px';
+                indicator.style.top = '50%';
+                indicator.style.transform = 'translateY(-50%)';
+                indicator.style.width = '10px';
+                indicator.style.height = '10px';
+                indicator.style.backgroundColor = 'var(--primary-color)';
+                indicator.style.borderRadius = '50%';
+                indicator.style.boxShadow = '0 0 10px var(--primary-color)';
+                indicator.style.animation = 'pulse 1s infinite';
+                targetElement.style.position = 'relative';
+                targetElement.appendChild(indicator);
+                
+                // 移除高亮效果和指示器
+                setTimeout(() => {
+                  targetElement.style.backgroundColor = '';
+                  targetElement.style.paddingLeft = '';
+                  targetElement.style.borderLeft = '';
+                  targetElement.style.boxShadow = '';
+                  targetElement.style.borderRadius = '';
+                  
+                  if (indicator.parentNode) {
+                    indicator.parentNode.removeChild(indicator);
+                  }
+                }, 2000);
+              }
+            }
+          });
+        });
+
+        // 监听滚动事件
+        window.addEventListener('scroll', highlightTocItem);
+        highlightTocItem(); // 初始高亮
+      });
+    </script>
+  )}
+</Layout>
+<style>
+  .card {
+  width: 100%;
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin: 2rem auto;
+  background-color: rgba(255, 255, 255, 0.3);
+}
+</style>

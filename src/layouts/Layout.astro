@@ -1,22 +1,825 @@
+---
+import { Image } from 'astro:assets';
+import { getCollection } from 'astro:content';
+import { siteConfig, themeConfig, profileConfig, homeConfig } from '../config';
+import '../styles/global.css';
+import '../styles/layout.css';
+import '../styles/search.css';
+import layoutCSS from '../styles/layout.css?raw';
+import TypewriterText from '../components/TypewriterText.astro';
+import BackgroundSwitcher from '../components/BackgroundSwitcher.astro';
+import avatarImage from '../assets/avatar.jpg';
+
+export interface Props {
+	title?: string;
+	description?: string;
+	image?: string;
+}
+
+const { title, description, image } = Astro.props;
+
+// 获取所有文章数据
+const postsData = await getCollection('posts');
+const serializedPosts = postsData.map(post => ({
+  id: post.id,
+  slug: post.slug,
+  data: {
+    title: post.data.title,
+    description: post.data.description,
+    tags: post.data.tags || [],
+    category: post.data.category || '未分类',
+    publishDate: post.data.publishDate,
+    author: post.data.author || '匿名',
+    cover: post.data.cover,
+  }
+}));
+
+// 页面标题处理
+const pageTitle = title ? `${title} | ${siteConfig.title}` : siteConfig.title;
+const pageDescription = description || siteConfig.subtitle;
+
+// 获取主题模式
+const getTheme = () => {
+  // 在服务器端只返回默认主题，实际主题将在客户端设置
+  return themeConfig.defaultTheme;
+};
+
+// 获取横幅图片
+// 注意：现在只返回一个空值或默认值，实际图片将在客户端动态设置
+const getBannerImage = () => {
+  return '';
+};
+
+// 获取背景图片
+// 注意：现在只返回一个空值或默认值，实际图片将在客户端动态设置
+const getBackgroundImage = () => {
+  return '';
+};
+
+// 检查当前页面是否为主页
+const isHomePage = Astro.url.pathname === '/' || Astro.url.pathname === '/index';
+---
+
 <!doctype html>
-<html lang="en">
+<html lang={siteConfig.lang} class={getTheme()}>
 	<head>
 		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro Basics</title>
+		<meta name="generator" content="Astro" />
+		
+		<!-- Font Awesome CSS -->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+		
+		<!-- SEO Meta Tags -->
+		<title>{pageTitle}</title>
+		<meta name="description" content={pageDescription} />
+		
+		<!-- Open Graph / Facebook -->
+		<meta property="og:type" content="website" />
+		<meta property="og:title" content={pageTitle} />
+		<meta property="og:description" content={pageDescription} />
+		<meta property="og:image" content={image || getBannerImage()} />
+		
+		<!-- Twitter -->
+		<meta property="twitter:card" content="summary_large_image" />
+		<meta property="twitter:title" content={pageTitle} />
+		<meta property="twitter:description" content={pageDescription} />
+		<meta property="twitter:image" content={image || getBannerImage()} />
+		
+		<!-- Theme and Layout Scripts -->
+		<script is:inline define:vars={{ themeConfig, siteConfig }}>
+			// 设置主题
+			const setTheme = (theme) => {
+				document.documentElement.className = theme;
+				localStorage.setItem('theme', theme);
+			};
+			
+			// 初始化主题
+			const initTheme = () => {
+				const savedTheme = localStorage.getItem('theme') || '{themeConfig.defaultTheme}';
+				setTheme(savedTheme);
+				
+				// 检查系统主题偏好
+				if (savedTheme === 'auto') {
+					const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+					document.documentElement.classList.toggle('dark', prefersDark);
+				}
+			};
+			
+			// 设置横幅高度
+			const setBannerHeight = () => {
+				const banner = document.querySelector('.banner');
+				if (banner) {
+					const height = window.innerHeight * siteConfig.banner.heightRatio;
+					banner.style.height = `${height}px`;
+				}
+			};
+			
+			// 初始化
+			document.addEventListener('DOMContentLoaded', () => {
+				initTheme();
+				setBannerHeight();
+				window.addEventListener('resize', setBannerHeight);
+			});
+			
+			// 监听系统主题变化
+			window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+				if (localStorage.getItem('theme') === 'auto') {
+					document.documentElement.classList.toggle('dark', e.matches);
+				}
+			});
+		</script>
+		
+		<!-- Global CSS Variables -->
+		<style is:global>
+			:root {
+				--primary-color: {siteConfig.primaryColor};
+				--banner-height: {siteConfig.banner.heightRatio * 100}vh;
+				--content-width: {themeConfig.contentWidth}px;
+				--sidebar-width: {themeConfig.sidebarWidth}px;
+				--blur-amount: {themeConfig.background.blur}px;
+				--z-index-bg: {themeConfig.background.zIndex};
+			}
+		</style>
 	</head>
 	<body>
-		<slot />
+		<!-- 背景图片 -->
+	<div class="background-container" style={`opacity: ${siteConfig.background?.display?.opacity || 0.8};`}></div>
+		
+		<!-- 顶部高光效果 -->
+		{themeConfig.topHighlight && <div class="top-highlight"></div>}
+		
+		<!-- 导航栏 -->
+		<header class="navbar">
+			<nav>
+				<div class="nav-container">
+					<div class="nav-logo">
+						<button id="menu-toggle" class="menu-toggle" aria-label="菜单">
+							<svg class="menu-icon-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<path d="M3 12H21M3 6H21M3 18H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+							</svg>
+							<svg class="menu-icon-svg close-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+							</svg>
+						</button>
+						<a href="/" class="logo-link">
+							<span class="site-name">{siteConfig.title}</span>
+						</a>
+					</div>
+					
+					<div class="nav-menu">
+						<a href="/" class="nav-link" data-page="home">首页</a>
+						<a href="/archive" class="nav-link" data-page="archive">归档</a>
+						<a href="/categories" class="nav-link" data-page="categories">分类</a>
+						<a href="/tags" class="nav-link" data-page="tags">标签</a>
+						<a href="/about" class="nav-link" data-page="about">关于</a>
+					</div>
+					
+					<!-- 移动端导航菜单 -->
+					<!-- 移动端下拉菜单 -->
+					<div id="mobile-menu" class="mobile-menu">
+						<div class="mobile-menu-header">
+							{profileConfig.avatar ? (
+								<Image 
+									src={avatarImage} 
+									alt={profileConfig.name}
+									width="60"
+									height="60"
+									class="mobile-avatar"
+								/>
+							) : (
+								<div class="mobile-avatar-placeholder">{profileConfig.name.charAt(0)}</div>
+							)}
+							<h3 class="mobile-profile-name">{profileConfig.name}</h3>
+							<p class="mobile-profile-bio">{profileConfig.bio}</p>
+						</div>
+						<div class="mobile-menu-content">
+							<a href="/" class="mobile-nav-link" data-page="home">首页</a>
+							<a href="/archive" class="mobile-nav-link" data-page="archive">归档</a>
+							<a href="/categories" class="mobile-nav-link" data-page="categories">分类</a>
+							<a href="/tags" class="mobile-nav-link" data-page="tags">标签</a>
+							<a href="/about" class="mobile-nav-link" data-page="about">关于</a>
+						</div>
+					</div>
+					
+					<div class="nav-controls">
+						<div class="navbar-search" style="background: none;">
+							<input type="text" placeholder="搜索文章..." class="search-input" id="navbar-search-input" />
+							<div class="search-icon-wrapper" id="navbar-search-icon-wrapper">
+								<button type="button" class="search-icon" title="搜索" id="navbar-search-icon">
+									<i class="fas fa-search"></i>
+								</button>
+							</div>
+							<div class="search-results" id="navbar-search-results"></div>
+						</div>
+						<a href={siteConfig.navbar.projectlink} class="github-link" alt="跳转至项目Github界面" aria-label="GitHub" target="_blank" rel="noopener noreferrer">
+							<i class="fab fa-github"></i>
+						</a>
+					</div>
+				</div>
+			</nav>
+		</header>
+		
+		<!-- 横幅区域 - 仅在首页显示 -->
+		<section class="banner" id="main-banner">
+			<div class="banner-content">
+				{(
+					<>
+						<h1 class="banner-title">{siteConfig.title}</h1>
+						<!-- <p class="banner-subtitle">{description || siteConfig.subtitle}</p> -->
+						{homeConfig.typewriter && homeConfig.typewriter.enable && homeConfig.typewriter.texts && (
+							<div class="typewriter-container">
+								<TypewriterText 
+									text={homeConfig.typewriter.texts}
+									speed={homeConfig.typewriter.speed || 100}
+									deleteSpeed={homeConfig.typewriter.deleteSpeed || 50}
+									pauseTime={homeConfig.typewriter.pauseTime || 2000}
+								/>
+							</div>
+						)}
+					</>
+				)}
+			</div>
+		</section>
+		
+		<!-- 主要内容 -->
+		<main class="main-content" id="main-content">
+			<slot />
+		</main>
+		
+		<!-- 页脚 -->
+		<footer class="footer">
+			<div class="footer-content">
+				<p>&copy; {new Date().getFullYear()} {siteConfig.title}. All rights reserved.</p>
+				{siteConfig.license && <p>{siteConfig.license}</p>}
+			</div>
+		</footer>
+		
+		<!-- 背景切换按钮 -->
+		<BackgroundSwitcher />
+		
+		<!-- 背景图片脚本 -->
+		<script src="/scripts/background.js" is:inline></script>
+		
+		<!-- 测试脚本 -->
+		<script is:inline>
+			document.addEventListener('DOMContentLoaded', () => {
+				console.log('DOM loaded');
+				console.log('background.js is loaded');
+			});
+		</script>
+		
+		<!-- 文章数据传递 -->
+		<script is:inline define:vars={{ serializedPosts }}>
+			window.postsData = serializedPosts;
+		</script>
+		
+		<!-- 调试脚本 -->
+		<script is:inline define:vars={{ homeConfig }}>
+			document.addEventListener('DOMContentLoaded', () => {
+				console.log('DOM loaded');
+				const typewriterElements = document.querySelectorAll('.typewriter-text');
+				console.log('Found typewriter elements:', typewriterElements.length);
+				
+				if (typewriterElements.length > 0) {
+					typewriterElements.forEach((element, index) => {
+						console.log(`Typewriter element ${index}:`, element);
+						console.log(`Typewriter dataset ${index}:`, element.dataset);
+					});
+				} else {
+					console.log('No typewriter elements found');
+				}
+			});
+		</script>
+		
+		<!-- 导航脚本 -->
+		<script is:inline>
+			// 刷新背景图片函数
+			const refreshBackground = async () => {
+				// 检测设备类型
+				const isMobile = window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+				const folder = isMobile ? 'mobile' : 'desktop';
+				const backgroundImageUrl = `/api/background/${folder}/random`;
+				
+				// 设置背景图片
+				const bgContainer = document.querySelector('.background-container');
+				if (bgContainer) {
+					// 移除过渡效果
+					const originalTransition = bgContainer.style.transition;
+					bgContainer.style.transition = 'none';
+					
+					// 设置背景图片
+					bgContainer.style.backgroundImage = `url(${backgroundImageUrl})`;
+					
+					// 强制重绘以确保立即生效
+					bgContainer.offsetHeight;
+					
+					// 恢复过渡效果
+					setTimeout(() => {
+						bgContainer.style.transition = originalTransition;
+					}, 50);
+				}
+			};
+			
+			// 检查设备类型变化并更新背景
+			let lastDeviceType = null;
+			const checkDeviceTypeChange = async () => {
+				const isMobile = window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+				const currentDeviceType = isMobile ? 'mobile' : 'desktop';
+				
+				// 如果设备类型发生了变化，立即更新背景图片
+				if (lastDeviceType && lastDeviceType !== currentDeviceType) {
+					console.log(`Device type changed from ${lastDeviceType} to ${currentDeviceType}, updating background image`);
+					
+					const bgContainer = document.querySelector('.background-container');
+					if (bgContainer) {
+						// 获取当前背景图片
+						const currentBg = bgContainer.style.backgroundImage;
+						if (currentBg && currentBg !== 'none') {
+							// 使用随机API获取新的背景图片
+							const newImageUrl = `/api/background/${currentDeviceType}/random`;
+							
+							// 移除过渡效果
+							const originalTransition = bgContainer.style.transition;
+							bgContainer.style.transition = 'none';
+							
+							// 更新背景图片
+							bgContainer.style.backgroundImage = `url(${newImageUrl})`;
+							
+							// 强制重绘以确保立即生效
+							bgContainer.offsetHeight;
+							
+							// 恢复过渡效果
+							setTimeout(() => {
+								bgContainer.style.transition = originalTransition;
+							}, 50);
+							
+							console.log(`Background image updated to: ${newImageUrl}`);
+						}
+					}
+				}
+				
+				lastDeviceType = currentDeviceType;
+			};
+			
+			// 监听窗口大小变化，检测设备类型变化
+			let resizeTimer;
+			window.addEventListener('resize', () => {
+				clearTimeout(resizeTimer);
+				resizeTimer = setTimeout(checkDeviceTypeChange, 100);
+			});
+			
+			// 初始化设备类型
+			checkDeviceTypeChange();
+			
+			// 导航链接处理
+			const initNavigation = () => {
+				const navLinks = document.querySelectorAll('.nav-link, .mobile-nav-link');
+				
+				// 获取当前页面路径
+				const getCurrentPage = () => {
+					const path = window.location.pathname;
+					if (path === '/' || path === '/index') return 'home';
+					if (path.startsWith('/archive')) return 'archive';
+					if (path.startsWith('/categories')) return 'categories';
+					if (path.startsWith('/tags')) return 'tags';
+					if (path.startsWith('/about')) return 'about';
+					return 'home';
+				};
+				
+				// 设置活动导航链接
+				const setActiveNavLink = () => {
+					const currentPage = getCurrentPage();
+					navLinks.forEach(link => {
+						link.classList.remove('active');
+						if (link.getAttribute('data-page') === currentPage) {
+							link.classList.add('active');
+						}
+					});
+				};
+				
+				// 初始化设置活动导航链接
+				setActiveNavLink();
+			};
+			
+			// 移动端菜单切换 - 下拉式
+			const initMobileMenu = () => {
+				const menuToggle = document.getElementById('menu-toggle');
+				const mobileMenu = document.getElementById('mobile-menu');
+				const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+				
+				if (menuToggle && mobileMenu) {
+					// 菜单切换事件
+					menuToggle.addEventListener('click', (e) => {
+						e.stopPropagation(); // 防止事件冒泡
+						mobileMenu.classList.toggle('active');
+						menuToggle.classList.toggle('active');
+					});
+					
+					// 点击导航链接后关闭菜单
+					mobileNavLinks.forEach(link => {
+						link.addEventListener('click', () => {
+							mobileMenu.classList.remove('active');
+							menuToggle.classList.remove('active');
+						});
+					});
+					
+					// 点击菜单外部关闭菜单
+					document.addEventListener('click', (e) => {
+						if (mobileMenu.classList.contains('active') && 
+							!menuToggle.contains(e.target) && 
+							!mobileMenu.contains(e.target)) {
+							mobileMenu.classList.remove('active');
+							menuToggle.classList.remove('active');
+						}
+					});
+					
+					// 阻止菜单内部点击事件冒泡
+					mobileMenu.addEventListener('click', (e) => {
+						e.stopPropagation();
+					});
+					
+					// ESC键关闭菜单
+					document.addEventListener('keydown', (e) => {
+						if (e.key === 'Escape' && mobileMenu.classList.contains('active')) {
+							mobileMenu.classList.remove('active');
+							menuToggle.classList.remove('active');
+						}
+					});
+				}
+			};
+			
+			// 导航栏搜索功能
+			const initNavbarSearch = () => {
+				const navbarSearchInput = document.getElementById('navbar-search-input');
+				const navbarSearchIcon = document.getElementById('navbar-search-icon');
+				const navbarSearchIconWrapper = document.getElementById('navbar-search-icon-wrapper');
+				const searchResults = document.getElementById('navbar-search-results');
+				
+				console.log('Search elements:', {
+					navbarSearchInput,
+					navbarSearchIcon,
+					navbarSearchIconWrapper,
+					searchResults
+				});
+				
+				if (!navbarSearchInput || !searchResults || !navbarSearchIcon || !navbarSearchIconWrapper) {
+					console.error('Search elements not found');
+					return;
+				}
+				
+				// 检查元素样式
+				console.log('Search icon styles:', window.getComputedStyle(navbarSearchIcon));
+				console.log('Search input styles:', window.getComputedStyle(navbarSearchInput));
+				console.log('Search container styles:', window.getComputedStyle(navbarSearchInput.parentElement));
+				
+				// 搜索函数
+				const performSearch = (query) => {
+					if (!query.trim()) {
+						searchResults.innerHTML = '';
+						searchResults.style.display = 'none';
+						return;
+					}
+					
+					const posts = window.postsData || [];
+					const results = [];
+					
+					// 搜索文章
+					posts.forEach(post => {
+						const title = post.data.title.toLowerCase();
+						const description = post.data.description.toLowerCase();
+						const tags = (post.data.tags || []).map(tag => tag.toLowerCase()).join(' ');
+						const category = post.data.category.toLowerCase();
+						const searchQuery = query.toLowerCase();
+						
+						// 计算相关性分数
+						let score = 0;
+						
+						// 标题匹配权重最高
+						if (title.includes(searchQuery)) {
+							score += 10;
+						}
+						
+						// 描述匹配
+						if (description.includes(searchQuery)) {
+							score += 5;
+						}
+						
+						// 标签匹配
+						if (tags.includes(searchQuery)) {
+							score += 7;
+						}
+						
+						// 分类匹配
+						if (category.includes(searchQuery)) {
+							score += 6;
+						}
+						
+						// 如果有匹配，添加到结果中
+						if (score > 0) {
+							results.push({
+								...post,
+								score
+							});
+						}
+					});
+					
+					// 按分数排序
+					results.sort((a, b) => b.score - a.score);
+					
+					// 显示搜索结果
+					displaySearchResults(results, query);
+				};
+				
+				// 显示搜索结果
+				const displaySearchResults = (results, query) => {
+					if (results.length === 0) {
+						searchResults.innerHTML = `
+							<div class="search-result-item no-results">
+								<p>没有找到与 "${query}" 相关的文章</p>
+							</div>
+						`;
+						searchResults.style.display = 'block';
+						return;
+					}
+					
+					// 限制显示结果数量
+					const maxResults = 5;
+					const limitedResults = results.slice(0, maxResults);
+					
+					// 生成搜索结果HTML
+					const resultsHTML = limitedResults.map(post => {
+						// 高亮匹配的关键词
+						const highlightText = (text, query) => {
+							const regex = new RegExp(`(${query})`, 'gi');
+							return text.replace(regex, '<mark>$1</mark>');
+						};
+						
+						const highlightedTitle = highlightText(post.data.title, query);
+						const highlightedDescription = highlightText(post.data.description.substring(0, 100) + '...', query);
+						
+						// 格式化日期
+						const formatDate = (dateString) => {
+							const date = new Date(dateString);
+							return date.toLocaleDateString('zh-CN', {
+								year: 'numeric',
+								month: 'long',
+								day: 'numeric'
+							});
+						};
+						
+						return `
+							<a href="/posts/${post.slug}" class="search-result-item">
+								<div class="search-result-content">
+									<h3 class="search-result-title">${highlightedTitle}</h3>
+									<p class="search-result-description">${highlightedDescription}</p>
+									<div class="search-result-meta">
+										<span class="search-result-date">${formatDate(post.data.publishDate)}</span>
+										<span class="search-result-category">${post.data.category}</span>
+									</div>
+								</div>
+							</a>
+						`;
+					}).join('');
+					
+					searchResults.innerHTML = resultsHTML;
+					searchResults.style.display = 'block';
+				};
+				
+				// 输入事件
+				let searchTimeout;
+				navbarSearchInput.addEventListener('input', (e) => {
+					const query = e.target.value.trim();
+					
+					// 防抖处理
+					clearTimeout(searchTimeout);
+					searchTimeout = setTimeout(() => {
+						performSearch(query);
+					}, 300);
+				});
+				
+				// 输入框点击事件
+				navbarSearchInput.addEventListener('click', (e) => {
+					console.log('Search input clicked');
+					e.stopPropagation();
+				});
+				
+				// 搜索容器点击事件
+				navbarSearchInput.parentElement.addEventListener('click', (e) => {
+					console.log('Search container clicked');
+					if (e.target !== navbarSearchIcon) {
+						navbarSearchInput.focus();
+					}
+				});
+				
+				// 点击搜索图标
+				navbarSearchIcon.addEventListener('click', (e) => {
+					console.log('Search icon clicked');
+					e.preventDefault();
+					e.stopPropagation();
+					e.stopImmediatePropagation();
+					const query = navbarSearchInput.value.trim();
+					if (query) {
+						performSearch(query);
+					} else {
+						// 如果没有输入内容，聚焦到输入框
+						navbarSearchInput.focus();
+					}
+				});
+				
+				// 点击搜索图标包装器
+				navbarSearchIconWrapper.addEventListener('click', (e) => {
+					console.log('Search icon wrapper clicked');
+					e.preventDefault();
+					e.stopPropagation();
+					e.stopImmediatePropagation();
+					const query = navbarSearchInput.value.trim();
+					if (query) {
+						performSearch(query);
+					} else {
+						// 如果没有输入内容，聚焦到输入框
+						navbarSearchInput.focus();
+					}
+				});
+				
+				// 键盘事件
+				navbarSearchInput.addEventListener('keydown', (e) => {
+					if (e.key === 'Enter') {
+						const query = navbarSearchInput.value.trim();
+						if (query) {
+							performSearch(query);
+						}
+					} else if (e.key === 'Escape') {
+						searchResults.style.display = 'none';
+						navbarSearchInput.blur();
+					}
+				});
+				
+				// 点击外部关闭搜索结果
+				document.addEventListener('click', (e) => {
+					if (!e.target.closest('.navbar-search')) {
+						searchResults.style.display = 'none';
+					}
+				});
+			};
+			
+			// 初始化所有功能
+			document.addEventListener('DOMContentLoaded', () => {
+				initNavigation();
+				initMobileMenu();
+				initNavbarSearch();
+				
+				// 添加测试函数到全局作用域
+				window.testSearch = () => {
+					const navbarSearchInput = document.getElementById('navbar-search-input');
+					const navbarSearchIcon = document.getElementById('navbar-search-icon');
+					const navbarSearchIconWrapper = document.getElementById('navbar-search-icon-wrapper');
+					const searchResults = document.getElementById('navbar-search-results');
+					
+					console.log('Test search elements:', {
+						navbarSearchInput,
+						navbarSearchIcon,
+						navbarSearchIconWrapper,
+						searchResults
+					});
+					
+					if (navbarSearchIcon) {
+						console.log('Simulating click on search icon');
+						navbarSearchIcon.click();
+					}
+					
+					if (navbarSearchIconWrapper) {
+						console.log('Simulating click on search icon wrapper');
+						navbarSearchIconWrapper.click();
+					}
+				};
+				
+				// 如果在搜索页面，检查URL参数并填充搜索框
+				if (window.location.pathname === '/search') {
+					const urlParams = new URLSearchParams(window.location.search);
+					const query = urlParams.get('q');
+					if (query) {
+						const navbarSearchInput = document.getElementById('navbar-search-input');
+						if (navbarSearchInput) {
+							navbarSearchInput.value = query;
+						}
+					}
+				}
+			});
+			
+			// 初始化背景图片
+			refreshBackground();
+			
+			// 初始化banner可见性
+			updateBannerVisibility();
+			
+			// 更新banner可见性
+			function updateBannerVisibility() {
+				const banner = document.getElementById('main-banner');
+				const mainContent = document.getElementById('main-content');
+				if (!banner || !mainContent) return;
+				
+				const currentPath = window.location.pathname;
+				const isHomePage = currentPath === '/' || currentPath === '/index';
+				
+				if (isHomePage) {
+					banner.classList.remove('banner-hidden');
+					mainContent.classList.remove('main-content-no-banner');
+				} else {
+					banner.classList.add('banner-hidden');
+					mainContent.classList.remove('main-content-no-banner');
+				}
+			}
+			
+			// Swup钩子设置
+			const setupSwupHooks = () => {
+				if (window.swup) {
+					// 页面访问开始时添加过渡动画
+					window.swup.hooks.on('visit:start', () => {
+						// 添加页面切换过渡效果
+						document.body.classList.add('page-transitioning');
+						// 更新导航状态
+						initNavigation();
+						// 更新banner可见性
+						updateBannerVisibility();
+					});
+					
+					// 页面内容替换后更新导航状态
+					window.swup.hooks.on('content:replace', () => {
+						// 更新导航状态
+						initNavigation();
+						// 不再刷新背景图片，保持当前背景
+						// refreshBackground();
+						// 更新banner可见性
+						updateBannerVisibility();
+					});
+					
+					// 页面过渡完成后移除过渡类
+					window.swup.hooks.on('page:view', () => {
+						// 移除页面切换过渡效果
+						setTimeout(() => {
+							document.body.classList.remove('page-transitioning');
+						}, 100);
+					});
+				}
+			};
+			
+			// 如果Swup已经初始化，立即设置钩子
+			if (window.swup) {
+				setupSwupHooks();
+			} else {
+				// 否则等待Swup初始化
+				document.addEventListener('swup:enable', setupSwupHooks);
+			}
+			
+			// 监听系统主题变化
+			window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+				if (localStorage.getItem('theme') === 'auto') {
+					document.documentElement.classList.toggle('dark', e.matches);
+				}
+			});
+		</script>
+		<!-- Layout CSS -->
+		<style is:global>{layoutCSS}</style>
+		
+		<!-- 技能条动画脚本 -->
+		<script>
+			// 技能条动画函数
+			function animateSkillBars() {
+				const skillBars = document.querySelectorAll('.skill-bar');
+				skillBars.forEach((bar, index) => {
+					const width = bar.style.width;
+					// 先设置为0，然后添加动画
+					bar.style.width = '0%';
+					// 为每个技能条添加递增的延迟，创建波浪效果
+					const delay = 100 + (index * 100); // 每个条延迟100ms
+					setTimeout(() => {
+						bar.style.width = width;
+					}, delay);
+				});
+			}
+			
+			// 当页面加载完成后，为技能条添加动画效果
+			document.addEventListener('DOMContentLoaded', () => {
+				// 检查是否在关于页面
+				if (window.location.pathname === '/about') {
+					// 延迟执行以确保元素已经渲染
+					setTimeout(animateSkillBars, 300);
+				}
+			});
+			
+			// 监听页面导航变化
+			if (window.swup) {
+				// 页面内容替换后检查是否需要启动动画
+				window.swup.hooks.on('content:replace', () => {
+					// 检查是否导航到关于页面
+					if (window.location.pathname === '/about') {
+						// 延迟执行以确保元素已经渲染
+						setTimeout(animateSkillBars, 300);
+					}
+				});
+			}
+		</script>
 	</body>
 </html>
-
-<style>
-	html,
-	body {
-		margin: 0;
-		width: 100%;
-		height: 100%;
-	}
-</style>

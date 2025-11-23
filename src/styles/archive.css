@@ -1,0 +1,411 @@
+/* 归档页面样式 */
+
+.archive-main {
+  padding: 2rem 0;
+  min-height: calc(100vh - 60px);
+}
+
+.container {
+  max-width: var(--content-width);
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.archive-header {
+  margin-bottom: 3rem;
+  text-align: center;
+}
+
+.archive-title {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.archive-description {
+  font-size: 1.1rem;
+  color: var(--text-color);
+  opacity: 0.8;
+}
+
+.archive-content {
+  margin-bottom: 3rem;
+}
+
+.archive-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+.archive-section {
+  padding: 2rem;
+  margin: 0 auto;
+}
+
+.section-title {
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--primary-color);
+}
+
+/* 年份卡片 */
+.year-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.year-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  text-decoration: none;
+  color: var(--text-color);
+  transition: all 0.3s ease;
+}
+
+.year-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.year-number {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.year-count {
+  font-size: 0.9rem;
+  color: var(--text-color);
+  opacity: 0.7;
+}
+
+/* 分类卡片 */
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.category-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  text-decoration: none;
+  color: var(--text-color);
+  transition: all 0.3s ease;
+}
+
+.category-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.category-name {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.category-count {
+  font-size: 0.9rem;
+  color: var(--text-color);
+  opacity: 0.7;
+}
+
+/* 标签云 */
+.tag-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  align-items: center;
+}
+
+.tag-cloud-item {
+  color: var(--primary-color);
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.tag-cloud-item:hover {
+  color: var(--text-color);
+  transform: scale(1.1);
+}
+
+/* 最新文章 */
+.recent-posts {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.recent-post {
+  background-color: var(--background-color);
+  border-radius: 8px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.recent-post:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.recent-post-title {
+  font-size: 1.2rem;
+  margin-bottom: 0.8rem;
+  line-height: 1.3;
+}
+
+.recent-post-title a {
+  color: var(--text-color);
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.recent-post-title a:hover {
+  color: var(--primary-color);
+}
+
+.recent-post-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  color: var(--text-color);
+  opacity: 0.7;
+}
+
+.post-category {
+  color: var(--primary-color);
+  text-decoration: none;
+  padding: 0.2rem 0.5rem;
+  background-color: rgba(var(--primary-color-rgb), 0.1);
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.post-category:hover {
+  background-color: rgba(var(--primary-color-rgb), 0.2);
+}
+
+.recent-post-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tag {
+  font-size: 0.8rem;
+  color: var(--primary-color);
+  text-decoration: none;
+  padding: 0.2rem 0.5rem;
+  background-color: rgba(var(--primary-color-rgb), 0.1);
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.tag:hover {
+  background-color: rgba(var(--primary-color-rgb), 0.2);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .archive-main {
+    padding: 1rem 0;
+  }
+  
+  .container {
+    padding: 0 0.75rem;
+  }
+  
+  .archive-header {
+    margin-bottom: 2rem;
+  }
+  
+  .archive-title {
+    font-size: 2rem;
+  }
+  
+  .archive-description {
+    font-size: 1rem;
+  }
+  
+  .archive-content {
+    margin-bottom: 2rem;
+  }
+  
+  .archive-sections {
+    gap: 2rem;
+  }
+  
+  .archive-section {
+    padding: 1.5rem;
+  }
+  
+  .section-title {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .year-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 0.8rem;
+  }
+  
+  .year-card {
+    padding: 1rem;
+  }
+  
+  .year-number {
+    font-size: 1.3rem;
+  }
+  
+  .category-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 0.8rem;
+  }
+  
+  .category-card {
+    padding: 1rem;
+  }
+  
+  .category-name {
+    font-size: 1.1rem;
+  }
+  
+  .tag-cloud {
+    gap: 0.6rem;
+  }
+  
+  .recent-posts {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .recent-post {
+    padding: 1rem;
+  }
+  
+  .recent-post-title {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .archive-main {
+    padding: 0.75rem 0;
+  }
+  
+  .container {
+    padding: 0 0.5rem;
+  }
+  
+  .archive-header {
+    margin-bottom: 1.5rem;
+  }
+  
+  .archive-title {
+    font-size: 1.8rem;
+  }
+  
+  .archive-description {
+    font-size: 0.95rem;
+  }
+  
+  .archive-content {
+    margin-bottom: 1.5rem;
+  }
+  
+  .archive-sections {
+    gap: 1.5rem;
+  }
+  
+  .archive-section {
+    padding: 1rem;
+  }
+  
+  .section-title {
+    font-size: 1.3rem;
+    margin-bottom: 0.8rem;
+  }
+  
+  .year-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 0.6rem;
+  }
+  
+  .year-card {
+    padding: 0.8rem;
+  }
+  
+  .year-number {
+    font-size: 1.2rem;
+  }
+  
+  .year-count {
+    font-size: 0.8rem;
+  }
+  
+  .category-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 0.6rem;
+  }
+  
+  .category-card {
+    padding: 0.8rem;
+  }
+  
+  .category-name {
+    font-size: 1rem;
+  }
+  
+  .category-count {
+    font-size: 0.8rem;
+  }
+  
+  .tag-cloud {
+    gap: 0.4rem;
+    justify-content: flex-start;
+  }
+  
+  .tag-cloud-item {
+    font-size: 0.9rem;
+  }
+  
+  .recent-posts {
+    gap: 0.8rem;
+  }
+  
+  .recent-post {
+    padding: 0.8rem;
+  }
+  
+  .recent-post-title {
+    font-size: 1rem;
+  }
+  
+  .recent-post-meta {
+    font-size: 0.8rem;
+    gap: 0.5rem;
+  }
+  
+  .tag {
+    font-size: 0.75rem;
+    padding: 0.15rem 0.4rem;
+  }
+}

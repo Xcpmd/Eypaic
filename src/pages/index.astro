@@ -1,11 +1,163 @@
 ---
-import Welcome from '../components/Welcome.astro';
 import Layout from '../layouts/Layout.astro';
+import indexCSS from '../styles/index.css?raw';
+import '../styles/index.css';
+import '../styles/global.css';
+// 禁用预渲染，以允许访问Astro.request
+// 这是解决'Astro.request.headers is not available on prerendered pages'警告的方法
+export const prerender = false;
+import { Image } from 'astro:assets';
+import { siteConfig, homeConfig, profileConfig } from '../config';
+import { getCollection } from 'astro:content';
+import avatarImage from '../assets/avatar.jpg';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+// 获取最新文章
+const posts = await getCollection('posts', ({ data }) => {
+  return data.draft !== true;
+});
+
+// 按日期排序，取最新的几篇
+const sortedPosts = posts && Array.isArray(posts) ? posts.sort((a, b) => {
+  const dateA = a.data.pubDate || a.data.date;
+  const dateB = b.data.pubDate || b.data.date;
+  return new Date(dateB).valueOf() - new Date(dateA).valueOf();
+}) : [];
+
+// 注意：横幅图片和背景图片现在都通过客户端JavaScript加载，以避免预渲染问题
+// 服务器端只返回空值或默认值
+const getBannerImage = () => {
+  // 返回空值，实际图片将在客户端动态设置
+  return '';
+};
+
+const getBackgroundImage = () => {
+  // 返回空值，实际图片将在客户端动态设置
+  return '';
+};
+
+// 格式化日期
+const formatDate = (date: Date) => {
+  return new Intl.DateTimeFormat('zh-CN', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  }).format(date);
+};
 ---
 
-<Layout>
-	<Welcome />
+<Layout title={siteConfig.title}>
+  <!-- 主要内容区域 -->
+  <section class="content-section">
+    <div class="container">
+      <div class="main-column">
+        <!-- 个人简介卡片 -->
+        <div class="profile-card base-card fade-in">
+          <div class="profile-header">
+            {profileConfig.avatar ? (
+              <a href="/about" aria-label="关于我">
+                <Image 
+                  src={avatarImage} 
+                  alt={profileConfig.name}
+                  width={180}
+                  height={180}
+                  class="profile-avatar"
+                />
+              </a>
+            ) : (
+              <a href="/about" aria-label="关于我">
+                <div class="profile-avatar-placeholder">{profileConfig.name.charAt(0)}</div>
+              </a>
+            )}
+            <div class="profile-info">
+              <h2 class="profile-name"><a href="/about" style="text-decoration: none; color: inherit;">{profileConfig.name}</a></h2>
+              <p class="profile-bio">{profileConfig.bio}</p>
+              <div class="profile-social">
+                {profileConfig.socialLinks && Array.isArray(profileConfig.socialLinks) && profileConfig.socialLinks.map((social) => (
+                  <a href={social.url} target="_blank" rel="noopener noreferrer" class="social-link" aria-label={social.name}>
+                    <i class={social.icon}></i>
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 最新文章 -->
+        <div class="posts-card base-card fade-in">
+          <h2 class="section-title">最新文章</h2>
+          {sortedPosts && sortedPosts.length > 0 ? (
+            <div class="posts-list">
+              {sortedPosts.slice(0, homeConfig.recentPostsCount || 5).map((post) => (
+                <article class="post-item">
+                  <div class="post-meta">
+                    <time datetime={(post.data.pubDate || post.data.date).toISOString()}>{formatDate(post.data.pubDate || post.data.date)}</time>
+                    {post.data.categories && post.data.categories.length > 0 && (
+                      <div class="post-categories">
+                        {post.data.categories.map((category) => (
+                          <a href={`/categories/${category}`} class="post-category">{category}</a>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <h3 class="post-title">
+                    <a href={`/posts/${post.slug}`}>{post.data.title}</a>
+                  </h3>
+                  {post.data.description && (
+                    <p class="post-description">{post.data.description}</p>
+                  )}
+                  {post.data.tags && Array.isArray(post.data.tags) && post.data.tags.length > 0 && (
+                    <div class="tags">
+                      {post.data.tags.map((tag) => (
+                        <a href={`/tags/${tag}`} class="tag">#{tag}</a>
+                      ))}
+                    </div>
+                  )}
+                </article>
+              ))}
+            </div>
+          ) : (
+            <p class="empty-message">暂无文章，敬请期待！</p>
+          )}
+          {sortedPosts && sortedPosts.length > (homeConfig.recentPostsCount || 5) && (
+            <div class="view-more">
+              <a href="/archive" class="btn">查看更多文章</a>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <!-- 侧边栏已删除 -->
+    </div>
+  </section>
 </Layout>
+
+
+
+<!-- 动态图片加载脚本 -->
+<script>
+  // 在客户端检测设备类型并设置背景图片和横幅图片
+  document.addEventListener('DOMContentLoaded', () => {
+    const isMobile = /mobile|android|iphone|ipad|ipod/i.test(navigator.userAgent);
+    const folder = isMobile ? 'mobile' : 'desktop';
+    
+    // 加载背景图片
+    const backgroundImageUrl = `/api/background/${folder}/random`;
+    
+    // 设置背景图片
+    const bannerElement = document.querySelector('[data-background-container]');
+    if (bannerElement) {
+      // 确保背景容器有正确的样式
+      bannerElement.style.backgroundImage = `url(${backgroundImageUrl})`;
+      bannerElement.style.backgroundSize = 'cover';
+      bannerElement.style.backgroundPosition = 'center';
+    }
+    
+    // 尝试预加载下一张图片以提高用户体验
+    const nextBackgroundUrl = `/api/background/${folder}/random`;
+    const img = new Image();
+    img.src = nextBackgroundUrl;
+  });
+</script>
+
+<!-- 首页样式 -->
+<style is:global>{indexCSS}</style>

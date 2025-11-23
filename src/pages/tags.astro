@@ -1,0 +1,112 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+import { siteConfig } from '../config';
+import tagsCSS from '../styles/tags.css?raw';
+import '../styles/tags.css';
+import '../styles/global.css';
+
+// 获取所有文章
+const posts = await getCollection('posts');
+
+// 获取所有标签及其使用次数
+const tagsWithCount: Record<string, number> = {};
+posts.forEach(post => {
+  if (post.data.tags) {
+    post.data.tags.forEach(tag => {
+      tagsWithCount[tag] = (tagsWithCount[tag] || 0) + 1;
+    });
+  }
+});
+
+// 按使用次数排序标签
+const sortedTags = Object.entries(tagsWithCount)
+  .sort(([, a], [, b]) => b - a)
+  .map(([tag, count]) => ({ tag, count }));
+
+// 按字母顺序排序标签
+const alphabeticalTags = Object.entries(tagsWithCount)
+  .sort(([a], [b]) => a.localeCompare(b))
+  .map(([tag, count]) => ({ tag, count }));
+
+// 获取每个标签的最新文章
+const getLatestPostForTag = (tag: string) => {
+  return posts
+    .filter(post => post.data.tags && post.data.tags.includes(tag))
+    .sort((a, b) => new Date(b.data.pubDate || b.data.date).getTime() - new Date(a.data.pubDate || a.data.date).getTime())[0];
+};
+---
+
+<Layout title="标签" description="所有文章标签">
+  <main class="tags-main">
+    <div class="container">
+      <div class="tags-header">
+        <h1 class="tags-title">标签</h1>
+        <p class="tags-description">共 {sortedTags.length} 个标签</p>
+      </div>
+
+      <div class="tags-content">
+        <!-- 标签云 -->
+        <section class="tags-section base-card">
+          <h2 class="section-title">标签云</h2>
+          <div class="tag-cloud">
+            {sortedTags.map(({ tag, count }) => {
+              // 计算字体大小，基于使用次数
+              const fontSize = Math.max(0.8, Math.min(1.5, 0.8 + (count / 10) * 0.7));
+              // 计算透明度，基于使用次数
+              const opacity = Math.min(1, 0.6 + (count / 20));
+              return (
+                <a 
+                  href={`/tags/${tag}`} 
+                  class="tag-cloud-item"
+                  style={`font-size: ${fontSize}rem; opacity: ${opacity}`}
+                >
+                  #{tag} ({count})
+                </a>
+              );
+            })}
+          </div>
+        </section>
+
+        <!-- 按字母顺序排列的标签 -->
+        <section class="tags-section base-card">
+          <h2 class="section-title">所有标签</h2>
+          <div class="tags-list">
+            {alphabeticalTags.map(({ tag, count }) => {
+              const latestPost = getLatestPostForTag(tag);
+              return (
+                <div class="tag-item">
+                  <a href={`/tags/${tag}`} class="tag-name">
+                    #{tag}
+                  </a>
+                  <span class="tag-count">{count} 篇文章</span>
+                  {latestPost && (
+                    <a href={`/posts/${latestPost.slug}`} class="tag-latest">
+                      {latestPost.data.title}
+                    </a>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
+        {sortedTags.length === 0 && (
+          <div class="empty-tags">
+            <div class="empty-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                <line x1="7" y1="7" x2="7.01" y2="7"></line>
+              </svg>
+            </div>
+            <h3 class="empty-title">暂无标签</h3>
+            <p class="empty-description">文章还没有标签，请先为文章添加标签。</p>
+          </div>
+        )}
+      </div>
+    </div>
+  </main>
+
+  <!-- 标签页面样式 -->
+  <style is:global>{tagsCSS}</style>
+</Layout>

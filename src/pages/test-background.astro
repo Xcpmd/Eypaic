@@ -1,0 +1,81 @@
+---
+title: "背景切换测试"
+layout: "../../layouts/Layout.astro"
+---
+
+<div class="container mx-auto px-4 py-8">
+  <h1 class="text-3xl font-bold mb-6">背景切换测试</h1>
+  
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
+    <h2 class="text-xl font-semibold mb-4">测试说明</h2>
+    <p class="mb-4">这个页面用于测试背景图片在平台切换时的响应。请尝试以下操作：</p>
+    <ul class="list-disc pl-6 mb-4">
+      <li>调整浏览器窗口宽度，使其小于或大于768px</li>
+      <li>观察背景图片是否立即切换，没有过渡效果</li>
+      <li>点击下方的按钮手动切换背景图片</li>
+    </ul>
+  </div>
+  
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
+    <h2 class="text-xl font-semibold mb-4">设备类型检测</h2>
+    <p>当前设备类型: <span id="device-type" class="font-bold"></span></p>
+    <p>窗口宽度: <span id="window-width" class="font-bold"></span>px</p>
+    <p>当前背景图片: <span id="current-bg" class="font-bold"></span></p>
+  </div>
+  
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+    <h2 class="text-xl font-semibold mb-4">手动测试</h2>
+    <button id="switch-bg-btn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+      切换背景图片
+    </button>
+  </div>
+</div>
+
+<script is:inline>
+  document.addEventListener('DOMContentLoaded', () => {
+    // 更新设备类型信息
+    const updateDeviceInfo = () => {
+      const isMobile = window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      const deviceType = isMobile ? '移动端' : '桌面端';
+      const windowWidth = window.innerWidth;
+      
+      document.getElementById('device-type').textContent = deviceType;
+      document.getElementById('window-width').textContent = windowWidth;
+      
+      // 获取当前背景图片
+      const bgContainer = document.querySelector('.background-container');
+      if (bgContainer) {
+        const currentBg = bgContainer.style.backgroundImage;
+        if (currentBg && currentBg !== 'none') {
+          // 使用正则表达式匹配新的API格式
+          const match = currentBg.match(/\/api\/background\/(mobile|desktop)\/([^)]+)/);
+          if (match && match[1] && match[2]) {
+            const folder = match[1] === 'mobile' ? '移动端' : '桌面端';
+            const filename = match[2].replace(/["']/g, ''); // 移除可能的引号
+            document.getElementById('current-bg').textContent = `${folder} - ${filename}`;
+          } else {
+            document.getElementById('current-bg').textContent = '未知';
+          }
+        } else {
+          document.getElementById('current-bg').textContent = '未设置';
+        }
+      }
+    };
+    
+    // 初始化设备信息
+    updateDeviceInfo();
+    
+    // 监听窗口大小变化
+    window.addEventListener('resize', updateDeviceInfo);
+    
+    // 手动切换背景图片
+    document.getElementById('switch-bg-btn').addEventListener('click', () => {
+      if (window.switchBackground) {
+        window.switchBackground();
+        setTimeout(updateDeviceInfo, 100); // 延迟更新信息，确保背景已切换
+      } else {
+        console.error('window.switchBackground is not available');
+      }
+    });
+  });
+</script>

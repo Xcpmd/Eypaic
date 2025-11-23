@@ -1,0 +1,169 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+import { siteConfig } from '../config';
+import archiveCSS from '../styles/archive.css?raw';
+import '../styles/archive.css';
+import '../styles/global.css';
+
+// 获取所有文章
+const posts = await getCollection('posts');
+
+// 获取所有年份
+const years = Array.from(
+  new Set(posts.map(post => (post.data.pubDate || post.data.date).getFullYear()))
+).sort((a, b) => b - a);
+
+// 获取所有分类
+const categories = Array.from(
+  new Set(posts.flatMap(post => post.data.categories || []))
+).sort();
+
+// 获取所有标签及其使用次数
+const tagsWithCount: Record<string, number> = {};
+posts.forEach(post => {
+  if (post.data.tags) {
+    post.data.tags.forEach(tag => {
+      tagsWithCount[tag] = (tagsWithCount[tag] || 0) + 1;
+    });
+  }
+});
+
+// 按使用次数排序标签
+const sortedTags = Object.entries(tagsWithCount)
+  .sort(([, a], [, b]) => b - a)
+  .map(([tag, count]) => ({ tag, count }));
+
+// 格式化日期
+const formatDate = (date: Date) => {
+  return new Intl.DateTimeFormat('zh-CN', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  }).format(date);
+};
+---
+
+<Layout title="归档" description="所有文章归档">
+  <main class="archive-main">
+    <div class="container">
+      <div class="archive-header">
+        <h1 class="archive-title">归档</h1>
+        <p class="archive-description">共 {posts.length} 篇文章</p>
+      </div>
+
+      <div class="archive-content">
+        <div class="archive-sections">
+          <!-- 按年份归档 -->
+          <section class="archive-section base-card">
+            <h2 class="section-title">按年份归档</h2>
+            <div class="year-grid">
+              {years.map(year => {
+                const yearPosts = posts.filter(post => (post.data.pubDate || post.data.date).getFullYear() === year);
+                return (
+                  <a href={`/archive/${year}`} class="year-card btn-card">
+                    <div class="year-number">{year}</div>
+                    <div class="year-count">{yearPosts.length} 篇文章</div>
+                  </a>
+                );
+              })}
+            </div>
+          </section>
+
+          <!-- 分类 -->
+          {categories.length > 0 && (
+            <section class="archive-section base-card">
+              <h2 class="section-title">分类</h2>
+              <div class="category-grid">
+                {categories.map(category => {
+                  const categoryPosts = posts.filter(post => post.data.categories && post.data.categories.includes(category));
+                  return (
+                    <a href={`/categories/${category}`} class="category-card">
+                      <div class="category-name">{category}</div>
+                      <div class="category-count">{categoryPosts.length} 篇文章</div>
+                    </a>
+                  );
+                })}
+              </div>
+            </section>
+          )}
+
+          <!-- 标签云 -->
+          {sortedTags.length > 0 && (
+            <section class="archive-section base-card">
+              <h2 class="section-title">标签云</h2>
+              <div class="tag-cloud">
+                {sortedTags.map(({ tag, count }) => {
+                  // 计算字体大小，基于使用次数
+                  const fontSize = Math.max(0.8, Math.min(1.5, 0.8 + (count / 10) * 0.7));
+                  return (
+                    <a 
+                      href={`/tags/${tag}`} 
+                      class="tag-cloud-item"
+                      style={`font-size: ${fontSize}rem; opacity: ${0.7 + (count / 20)}`}
+                    >
+                      #{tag} ({count})
+                    </a>
+                  );
+                })}
+              </div>
+            </section>
+          )}
+
+          <!-- 最新文章 -->
+          <section class="archive-section base-card">
+            <h2 class="section-title">最新文章</h2>
+            <div class="recent-posts">
+              {posts
+                .sort((a, b) => new Date(b.data.pubDate || b.data.date).getTime() - new Date(a.data.pubDate || a.data.date).getTime())
+                .slice(0, 10)
+                .map(post => (
+                  <article class="recent-post card">
+                    <h3 class="recent-post-title">
+                      <a href={`/posts/${post.slug}`}>{post.data.title}</a>
+                    </h3>
+                    <div class="recent-post-meta">
+                      <time datetime={(post.data.pubDate || post.data.date).toISOString()}>
+                        {formatDate(post.data.pubDate || post.data.date)}
+                      </time>
+                      {post.data.categories && post.data.categories.length > 0 && (
+                        <div class="recent-post-categories">
+                          {post.data.categories.map(category => (
+                            <a href={`/categories/${category}`} class="post-category">
+                              {category}
+                            </a>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    {post.data.tags && post.data.tags.length > 0 && (
+                      <div class="recent-post-tags">
+                        {post.data.tags.map(tag => (
+                          <a href={`/tags/${tag}`} class="tag">#{tag}</a>
+                        ))}
+                      </div>
+                    )}
+                  </article>
+                ))}
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- 归档页面样式 -->
+  <style is:global>{archiveCSS}</style>
+  <style>
+    .card {
+      width: 90%;
+      max-width: 800px;
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      margin: 2rem auto;
+      background-color: rgba(255, 255, 255, 0.3);
+    }
+  </style>
+</Layout>
