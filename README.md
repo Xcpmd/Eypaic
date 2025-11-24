@@ -148,6 +148,8 @@ Eypaic/
 
 项目提供了便捷的命令行工具添加新文章：
 
+使用目录下的 **新建文章.exe**
+
 ```bash
 # 使用 pnpm
 pnpm add-post "文章标题"
@@ -164,15 +166,18 @@ npm run add-post "文章标题"
 
 ```yaml
 ---
-title: 文章标题
-date: 2023-12-01
-author: 作者名
-authorAvatar: 作者头像路径
-tags: [标签1, 标签2]
-categories: [分类1, 分类2]
-description: 文章描述
-cover: 封面图片路径
-pinned: true # 是否置顶
+title: test # 文章标题
+date: 2025-11-24 # 文章发布日期 (自动填充)
+author: 作者名称 # 文章作者
+authorAvatar: /src/assets/avatar.jpg # 文章作者头像链接 (默认为/src/assets/avatar.jpg)
+tags: [标签1, 标签2] # 文章标签 (用逗号分隔)
+categories: [分类1, 分类2] # 文章分类 (用逗号分隔)
+description: "这是一篇测试文章" # 文章描述
+
+url: "" # 文章原文链接
+customCopyright: "Copyright © 2025 Xcpmd. All rights reserved." # 版权声明
+customLicense: "CC BY-NC-SA 4.0" # 授权协议
+customLicenseUrl: "https://creativecommons.org/licenses/by-nc-sa/4.0/" # 授权协议链接
 ---
 ```
 
@@ -267,6 +272,11 @@ export const profileConfig = {
 - **TypeScript** - 类型安全的 JavaScript 超集
 
 ## 📋 待办事项
+
+### 目前问题
+
+- [ ] config.ts 中部分配置无效
+- [ ] 代码复杂度较高, 不整洁, 难以维护
 
 ### 🔧 正在进行的功能开发
 
