@@ -200,6 +200,46 @@
   font-size: 0.9em;
 }
 
+/* KaTeX 样式支持 */
+.katex-display {
+  margin: 1.5rem 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.katex {
+  font-size: 1.1em;
+}
+
+.katex-display > .katex {
+  display: inline-block;
+  max-width: 100%;
+}
+
+.katex-html {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+/* 行内数学公式样式 */
+.katex-inline {
+  background-color: rgba(0, 0, 0, 0.05);
+  padding: 0.1rem 0.3rem;
+  border-radius: 3px;
+}
+
+/* 确保 KaTeX 公式在暗色模式下也能正常显示 */
+@media (prefers-color-scheme: dark) {
+  .katex {
+    color: inherit;
+  }
+  
+  .katex-inline {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+}
+}
+
 .post-content pre {
   margin: 1.5rem 0;
   padding: 1rem;

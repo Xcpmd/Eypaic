@@ -16,3 +16,7 @@ customLicenseUrl: "" # 授权协议链接
 # test
 
 在这里编写你的文章内容...
+
+$$\int_{-\infty}^{\infty} e^{-x^2} dx = \sqrt{\pi}$$
+
+$ E= mc^2 $
