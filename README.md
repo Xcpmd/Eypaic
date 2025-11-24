@@ -4,7 +4,7 @@
 
 一个基于 Astro 构建的现代化二次元风格个人博客系统，集成了响应式设计、主题切换、动态背景、搜索功能等丰富特性。
 
-![Eypaic Logo](/public/show.png)
+![Eypaic](/public/show.png)
 
 ## ✨ 项目特色
 
@@ -364,5 +364,6 @@ export const profileConfig = {
 感谢所有为这个项目做出贡献的开发者，以及使用和支持 Eypaic 的用户们！
 
 ---
+
 
 ⭐ 如果这个项目对您有帮助，请给个 Star 支持一下！
