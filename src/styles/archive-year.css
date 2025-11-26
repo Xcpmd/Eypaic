@@ -4,11 +4,7 @@
   min-height: calc(100vh - 60px);
 }
 
-.container {
-  max-width: var(--content-width);
-  margin: 0 auto;
-  padding: 0 1rem;
-}
+
 
 .archive-header {
   margin-bottom: 3rem;

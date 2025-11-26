@@ -1,5 +1,15 @@
+// 导入类型定义
+import type {
+  SiteConfig,
+  ProfileConfig,
+  HomeConfig,
+  PostConfig,
+  ThemeConfig,
+  Config
+} from './types/config';
+
 // 站点配置
-export const siteConfig = {
+export const siteConfig: SiteConfig = {
   title: "Eypaic",
   subtitle: "二次元风格博客",
   
@@ -9,72 +19,31 @@ export const siteConfig = {
   
   license: "基于 MIT 许可证", // 网站许可证
   
-  themeColor: {
-    hue: 210, // 主题色的默认色相，范围从 0 到 360
-    fixed: false, // 对访问者隐藏主题色选择器
-  },
-  
   // 横幅配置
   banner: {
-    desktop: [],
-    mobile: [],
     heightRatio: 0.4 // 横幅高度与视口高度的比例
   },
   
-  // 背景配置
-  background: {
-    // 轮播配置
-    carousel: {
-      enable: true, // 启用轮播
-      interval: 5, // 轮播间隔时间（秒）
-      shuffle: true, // 是否打乱轮播顺序
-    },
-    // 背景显示配置
-    display: {
-      blur: 0, // 背景模糊程度
-      opacity: 0.8, // 背景透明度
-    }
-  },
+
   
   // 导航栏配置
   navbar: {
-    links: [
-      { name: "首页", url: "/" },
-      { name: "归档", url: "/archive" },
-      { name: "分类", url: "/categories" },
-      { name: "标签", url: "/tags" },
-      { name: "集合", url: "/collections" },
-      { name: "关于", url: "/about" },
-    ],
     projectlink: "https://github.com/xcpmd/Eypaic", // 项目链接
   },
   
   // 文章配置
   posts: {
     directory: "/content/posts", // 文章目录
-    frontmatter: {
-      title: "标题",
-      date: "发布日期",
-      tags: "标签",
-      categories: "分类",
-      description: "描述",
-      pinned: "是否置顶",
-      cover: "封面图片",
-    },
   },
   
   // 页脚配置
   footer: {
     copyright: "© {year} Eypaic. All rights reserved.",
-    links: [
-      { name: "GitHub", url: "https://github.com" },
-      { name: "Gitee", url: "https://gitee.com" },
-    ],
   },
 };
 
 // 博主配置
-export const profileConfig = {
+export const profileConfig: ProfileConfig = {
   name: "Xcpmd", // 名称
   bio: "Ciallo~ (∠・ω< )⌒★", // 个人简介
   avatar: "/src/assets/avatar.jpg", // 头像路径
@@ -102,28 +71,7 @@ export const profileConfig = {
 };
 
 // 首页配置
-export const homeConfig = {
-  hero: {
-    enable: true,
-    title: "欢迎来到我的博客",
-    subtitle: "分享技术、生活和热爱",
-  },
-  posts: {
-    enable: true,
-    showCover: true, // 是否显示封面
-    pinnedFirst: true, // 置顶文章是否优先显示
-    limit: 10, // 首页显示文章数量
-  },
-  sidebar: {
-    enable: true,
-    position: "right", // 侧边栏位置：left 或 right
-    filters: [
-      { name: "默认排序", value: "default" },
-      { name: "按标签", value: "tags" },
-      { name: "按时间轴", value: "timeline" },
-      { name: "按集合", value: "collections" },
-    ],
-  },
+export const homeConfig: HomeConfig = {
   typewriter: {
     enable: true,
     texts: [
@@ -139,23 +87,11 @@ export const homeConfig = {
 };
 
 // 文章页配置
-export const postConfig = {
+export const postConfig: PostConfig = {
   toc: {
     enable: true,
     depth: 3, // 目录深度，1-6
     position: "left", // 目录位置：left 或 right
-  },
-  relatedPosts: {
-    enable: true,
-    limit: 5, // 相关文章数量
-  },
-  navigation: {
-    enable: true,
-    inCollectionFirst: true, // 是否优先按集合内顺序排列
-  },
-  readingTime: {
-    enable: true,
-    wordsPerMinute: 300, // 每分钟阅读字数
   },
   copyright: {
     enable: true, // 是否启用版权声明
@@ -167,15 +103,8 @@ export const postConfig = {
   }
 };
 
-// 评论配置
-export const commentConfig = {
-  enable: false, // 是否启用评论
-  provider: "", // 评论提供商：twikoo, gitalk, valine 等
-  config: {}, // 评论提供商配置
-};
-
 // 主题配置
-export const themeConfig = {
+export const themeConfig: ThemeConfig = {
   defaultTheme: "light", // 默认主题：light, dark, auto
   
   // 内容宽度配置
@@ -193,19 +122,6 @@ export const themeConfig = {
   // 顶部高光效果
   topHighlight: true, // 是否显示顶部高光效果
   
-  darkMode: {
-    enable: true,
-    default: "auto", // 默认主题：light, dark, auto
-    animation: {
-      enable: true,
-      duration: 0.8, // 动画持续时间（秒）
-    },
-  },
-  glassEffect: {
-    enable: true,
-    intensity: 0.8, // 毛玻璃效果强度
-    shadow: true, // 是否启用阴影
-  },
   typography: {
     fontFamily: "system-ui, -apple-system, sans-serif",
     lineHeight: 1.6,
@@ -213,24 +129,11 @@ export const themeConfig = {
   },
 };
 
-// 欢迎页面配置
-export const welcomeConfig = {
-  enable: true,
-  text: "欢迎来到我的博客",
-  animation: {
-    enable: true,
-    duration: 2, // 动画持续时间（秒）
-    fadeOut: 1, // 淡出时间（秒）
-  },
-};
-
 // 导出所有配置
-export const config = {
+export const config: Config = {
   site: siteConfig,
   profile: profileConfig,
   home: homeConfig,
   post: postConfig,
-  comment: commentConfig,
   theme: themeConfig,
-  welcome: welcomeConfig,
 };

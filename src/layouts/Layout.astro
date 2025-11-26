@@ -673,31 +673,6 @@ const isHomePage = Astro.url.pathname === '/' || Astro.url.pathname === '/index'
 				initMobileMenu();
 				initNavbarSearch();
 				
-				// 添加测试函数到全局作用域
-				window.testSearch = () => {
-					const navbarSearchInput = document.getElementById('navbar-search-input');
-					const navbarSearchIcon = document.getElementById('navbar-search-icon');
-					const navbarSearchIconWrapper = document.getElementById('navbar-search-icon-wrapper');
-					const searchResults = document.getElementById('navbar-search-results');
-					
-					console.log('Test search elements:', {
-						navbarSearchInput,
-						navbarSearchIcon,
-						navbarSearchIconWrapper,
-						searchResults
-					});
-					
-					if (navbarSearchIcon) {
-						console.log('Simulating click on search icon');
-						navbarSearchIcon.click();
-					}
-					
-					if (navbarSearchIconWrapper) {
-						console.log('Simulating click on search icon wrapper');
-						navbarSearchIconWrapper.click();
-					}
-				};
-				
 				// 如果在搜索页面，检查URL参数并填充搜索框
 				if (window.location.pathname === '/search') {
 					const urlParams = new URLSearchParams(window.location.search);

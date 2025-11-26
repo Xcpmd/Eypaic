@@ -5,11 +5,7 @@
   min-height: calc(100vh - 60px);
 }
 
-.container {
-  max-width: var(--content-width);
-  margin: 0 auto;
-  padding: 0 1rem;
-}
+
 
 .tags-header {
   margin-bottom: 3rem;
@@ -160,9 +156,7 @@
     padding: 1rem 0;
   }
   
-  .container {
-    padding: 0 0.75rem;
-  }
+  
   
   .tags-header {
     margin-bottom: 2rem;
@@ -217,9 +211,7 @@
     padding: 0.75rem 0;
   }
   
-  .container {
-    padding: 0 0.5rem;
-  }
+  
   
   .tags-header {
     margin-bottom: 1.5rem;

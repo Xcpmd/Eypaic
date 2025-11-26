@@ -16,10 +16,7 @@ import typewriterTextCSS from '../styles/typewriter-text.css?raw';
 let texts = Array.isArray(text) ? text : [text];
 const textData = JSON.stringify(texts);
 
-// 添加调试日志
-// console.log('TypewriterText props:', { text, speed, deleteSpeed, pauseTime, className });
-// console.log('TypewriterText texts:', texts);
-// console.log('TypewriterText textData:', textData);
+
 ---
 
 <div class={`typewriter-wrapper ${className}`}>

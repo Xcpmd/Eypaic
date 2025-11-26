@@ -25,11 +25,72 @@
   background-color: rgba(255, 255, 255, 0.3);
 }
 
+/* 容器样式 */
+.container {
+  max-width: var(--content-width);
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* 按钮样式 */
+.btn {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: var(--text-color);
+  border: 2px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+  background-color: var(--card-bg);
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* 卡片样式 */
+.card {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(5px);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
 /* 响应式设计 */
 @media (min-width: 1200px) {
-  .base-card {
-    width: 60%;
-    min-width: 800px;
+  .container {
+    max-width: 1200px;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0 1rem;
   }
 }
 
@@ -60,144 +121,6 @@
   margin-bottom: 1.5rem;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-/* 毛玻璃效果 */
-.glass {
-  /* backdrop-filter: blur(var(--blur-amount, 10px)); */
-  /* background-color: var(--card-bg); */
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-/* 卡片样式 */
-.card {
-  backdrop-filter: blur(10px);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-}
-
-/* 按钮样式 */
-.btn {
-  display: inline-block;
-  padding: 0.5rem 1rem;
-  background-color: var(--primary-color);
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-  text-decoration: none;
-}
-
-.btn:hover {
-  background-color: var(--primary-color-dark);
-  transform: translateY(-2px);
-}
-
-.btn:active {
-  transform: translateY(0);
-}
-
-.btn-secondary {
-  background-color: transparent;
-  color: var(--text-color);
-  border: 1px solid var(--border-color);
-}
-
-.btn-secondary:hover {
-  background-color: var(--card-bg);
-}
-
-/* 输入框样式 */
-.input {
-  width: 100%;
-  padding: 0.75rem;
-  background-color: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  color: var(--text-color);
-  font-size: 1rem;
-  transition: border-color 0.3s ease;
-}
-
-.input:focus {
-  outline: none;
-  border-color: var(--primary-color);
-}
-
-/* 文章样式 */
-.article {
-  margin-bottom: 2rem;
-}
-
-.article-header {
-  margin-bottom: 1rem;
-}
-
-.article-title {
-  font-size: 1.8rem;
-  margin-bottom: 0.5rem;
-  color: var(--text-color);
-}
-
-.article-meta {
-  font-size: 0.9rem;
-  color: var(--text-color);
-  opacity: 0.7;
-}
-
-.article-content {
-  line-height: 1.6;
-  color: var(--text-color);
-}
-
-.article-content h1,
-.article-content h2,
-.article-content h3,
-.article-content h4,
-.article-content h5,
-.article-content h6 {
-  margin: 1.5rem 0 0.5rem;
-  color: var(--text-color);
-}
-
-.article-content p {
-  margin-bottom: 1rem;
-}
-
-.article-content blockquote {
-  margin: 1rem 0;
-  padding: 0.5rem 1rem;
-  border-left: 4px solid var(--primary-color);
-  background-color: var(--card-bg);
-  font-style: italic;
-}
-
-.article-content code {
-  padding: 0.2rem 0.4rem;
-  background-color: rgba(0, 0, 0, 0.1);
-  border-radius: 3px;
-  font-family: 'Courier New', monospace;
-}
-
-.article-content pre {
-  margin: 1rem 0;
-  padding: 1rem;
-  background-color: rgba(0, 0, 0, 0.1);
-  border-radius: 5px;
-  overflow-x: auto;
 }
 
 .article-content pre code {

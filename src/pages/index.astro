@@ -25,15 +25,6 @@ const sortedPosts = posts && Array.isArray(posts) ? posts.sort((a, b) => {
 
 // 注意：横幅图片和背景图片现在都通过客户端JavaScript加载，以避免预渲染问题
 // 服务器端只返回空值或默认值
-const getBannerImage = () => {
-  // 返回空值，实际图片将在客户端动态设置
-  return '';
-};
-
-const getBackgroundImage = () => {
-  // 返回空值，实际图片将在客户端动态设置
-  return '';
-};
 
 // 格式化日期
 const formatDate = (date: Date) => {

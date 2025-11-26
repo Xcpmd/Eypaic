@@ -5,11 +5,7 @@
   min-height: calc(100vh - 60px);
 }
 
-.container {
-  max-width: var(--content-width);
-  margin: 0 auto;
-  padding: 0 1rem;
-}
+
 
 .post-wrapper {
   display: flex;
@@ -242,16 +238,175 @@
 
 .post-content pre {
   margin: 1.5rem 0;
-  padding: 1rem;
-  background-color: rgba(0, 0, 0, 0.05);
-  border-radius: 5px;
+  background-color: #1a1a1a;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #333;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+/* 代码块顶部栏 */
+.code-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  border-radius: 4px 4px 0 0;
+  background-color: #2a2a2a;
+  border-bottom: 1px solid #444;
+  font-size: 0.8rem;
+  color: #aaa;
+}
+
+.code-language {
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.copy-button {
+  background: transparent;
+  border: none;
+  color: #aaa;
+  padding: 0.3rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  alt: "复制代码";
+  margin-right: -0.2rem;
+}
+
+.copy-button:hover {
+  background-color: #3a3a3a;
+  color: #fff;
+  border-color: #666;
+}
+
+.copy-button.copied {
+  background-color: #4CAF50;
+  color: white;
+  border-color: #4CAF50;
+}
+
+.code-content {
+  padding: 0.8rem;
   overflow-x: auto;
 }
 
 .post-content pre code {
   padding: 0;
   background-color: transparent;
-  font-size: 0.9em;
+  font-size: 0.95em;
+  font-family: 'Fira Code', 'Consolas', 'Monaco', 'Courier New', monospace;
+  line-height: 1.5;
+  color: #f8f8f2;
+}
+
+/* 代码高亮样式 */
+.post-content pre code .token.comment,
+.post-content pre code .token.prolog,
+.post-content pre code .token.doctype,
+.post-content pre code .token.cdata {
+  color: #6272a4;
+}
+
+.post-content pre code .token.punctuation {
+  color: #f8f8f2;
+}
+
+.post-content pre code .token.property,
+.post-content pre code .token.tag,
+.post-content pre code .token.constant,
+.post-content pre code .token.symbol,
+.post-content pre code .token.deleted {
+  color: #ff79c6;
+}
+
+.post-content pre code .token.boolean,
+.post-content pre code .token.number {
+  color: #bd93f9;
+}
+
+.post-content pre code .token.selector,
+.post-content pre code .token.attr-name,
+.post-content pre code .token.string,
+.post-content pre code .token.char,
+.post-content pre code .token.builtin,
+.post-content pre code .token.inserted {
+  color: #50fa7b;
+}
+
+.post-content pre code .token.operator,
+.post-content pre code .token.entity,
+.post-content pre code .token.url,
+.post-content pre code .language-css .token.string,
+.post-content pre code .style .token.string {
+  color: #f8f8f2;
+}
+
+.post-content pre code .token.atrule,
+.post-content pre code .token.attr-value,
+.post-content pre code .token.keyword {
+  color: #8be9fd;
+}
+
+.post-content pre code .token.function,
+.post-content pre code .token.class-name {
+  color: #ffb86c;
+}
+
+.post-content pre code .token.regex,
+.post-content pre code .token.important,
+.post-content pre code .token.variable {
+  color: #ff5555;
+}
+
+/* 行内代码样式 */
+.post-content code:not(pre code) {
+  padding: 0.2rem 0.4rem;
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  font-family: 'Fira Code', 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 0.85em;
+  color: #e83e8c;
+}
+
+/* 通用语言类样式 - 支持所有语言 */
+[class^="language-"] {
+  /* padding: 0.2rem 0.4rem; */
+  background-color: rgba(32, 32, 32);
+  /* padding-top: 0.8rem; */
+  border-radius: 4px;
+  font-family: 'Fira Code', 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 0.85em;
+  color: #e83e8c;
+}
+
+/* 移除之前的语言标签样式 */
+
+/* 滚动条样式 */
+.post-content pre::-webkit-scrollbar {
+  height: 8px;
+}
+
+.post-content pre::-webkit-scrollbar-track {
+  background: #2a2a2a;
+  border-radius: 4px;
+}
+
+.post-content pre::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 4px;
+}
+
+.post-content pre::-webkit-scrollbar-thumb:hover {
+  background: #777;
 }
 
 .post-content img {

@@ -20,3 +20,8 @@ customLicenseUrl: "" # 授权协议链接
 $$\int_{-\infty}^{\infty} e^{-x^2} dx = \sqrt{\pi}$$
 
 $ E= mc^2 $
+
+```python
+def test():
+    print("Hello, world!")
+```
